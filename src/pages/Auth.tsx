@@ -48,6 +48,18 @@ export default function Auth({ type }: AuthProps = {}) {
           return;
         }
 
+        // Validation mot de passe fort
+        const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        if (!strongPasswordRegex.test(formData.password)) {
+          toast({
+            title: 'Mot de passe trop faible',
+            description: 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre.',
+            variant: 'destructive',
+          });
+          setIsLoading(false);
+          return;
+        }
+
         // Valider le format du téléphone sénégalais
         const phoneRegex = /^\+221[0-9]{9}$/;
         if (!formData.phone || formData.phone.length < 13) {
@@ -321,28 +333,35 @@ export default function Auth({ type }: AuthProps = {}) {
           )}
 
           {(mode === 'login' || mode === 'register' || mode === 'reset') && (
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Mot de passe"
-                value={formData.password}
-                onChange={handleChange}
-                className="pl-12 pr-12"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2"
-              >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5 text-muted-foreground" />
-                ) : (
-                  <Eye className="w-5 h-5 text-muted-foreground" />
-                )}
-              </button>
+            <div className="space-y-1">
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Mot de passe"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="pl-12 pr-12"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5 text-muted-foreground" />
+                  ) : (
+                    <Eye className="w-5 h-5 text-muted-foreground" />
+                  )}
+                </button>
+              </div>
+              {(mode === 'register' || mode === 'reset') && (
+                <p className="text-xs text-muted-foreground ml-1">
+                  💡 Pour votre sécurité : 8 caractères min., avec majuscule et chiffre.
+                </p>
+              )}
             </div>
           )}
 
