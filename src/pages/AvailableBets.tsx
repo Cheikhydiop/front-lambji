@@ -518,23 +518,23 @@ export default function AvailableBets() {
                   const canAccept = canAcceptBet(bet.canCancelUntil || '');
 
                   return (
-                    <Card key={bet.id} className="border-0 shadow-md hover:shadow-xl transition-all duration-300 bg-white rounded-2xl overflow-hidden ring-1 ring-black/5">
-                      {/* En-tête de carte avec dégradé subtil */}
-                      <div className="bg-gradient-to-r from-slate-50 to-white p-4 border-b border-gray-100">
+                    <Card key={bet.id} className="border-0 shadow-lg shadow-black/20 hover:shadow-black/40 transition-all duration-300 bg-[#1a1b1e] rounded-2xl overflow-hidden ring-1 ring-white/5">
+                      {/* En-tête de carte avec dégradé sombre subtil */}
+                      <div className="bg-gradient-to-r from-zinc-800/50 to-[#1a1b1e] p-4 border-b border-white/5">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <div className="relative">
-                              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold shadow-sm ring-2 ring-white">
+                              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold shadow-sm ring-2 ring-[#1a1b1e]">
                                 {bet.creator.name.charAt(0)}
                               </div>
                               {/* Indicateur en ligne optionnel */}
-                              <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
+                              <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-[#1a1b1e] rounded-full"></div>
                             </div>
                             <div>
-                              <p className="font-bold text-gray-900 leading-tight">{bet.creator.name}</p>
+                              <p className="font-bold text-gray-100 leading-tight">{bet.creator.name}</p>
                               <div className="flex items-center gap-1.5 mt-0.5">
                                 <Clock className="w-3 h-3 text-gray-400" />
-                                <p className="text-xs text-gray-500 font-medium">
+                                <p className="text-xs text-gray-400 font-medium">
                                   {formatTimeAgo(bet.createdAt)}
                                 </p>
                               </div>
@@ -543,11 +543,11 @@ export default function AvailableBets() {
 
                           {/* Badge de statut ou compte à rebours */}
                           {bet.canCancelUntil ? (
-                            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 font-medium px-2 py-0.5">
+                            <Badge variant="outline" className="bg-orange-950/30 text-orange-400 border-orange-900/50 font-medium px-2 py-0.5">
                               ⏳ {new Date(bet.canCancelUntil).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </Badge>
                           ) : (
-                            <Badge variant="secondary" className="bg-gray-100 text-gray-600 font-medium">
+                            <Badge variant="secondary" className="bg-zinc-800 text-gray-400 font-medium border border-zinc-700">
                               En attente
                             </Badge>
                           )}
@@ -559,7 +559,7 @@ export default function AvailableBets() {
                         <div className="p-5">
                           {/* Événement */}
                           <div className="flex justify-center mb-4">
-                            <Badge className="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0 shadow-sm px-3 py-1 text-xs uppercase tracking-wide">
+                            <Badge className="bg-gradient-to-r from-orange-600 to-orange-700 text-white border-0 shadow-sm px-3 py-1 text-xs uppercase tracking-wide">
                               {bet.fight.dayEvent.title}
                             </Badge>
                           </div>
@@ -569,12 +569,12 @@ export default function AvailableBets() {
                             {/* Lutteur A */}
                             <div className="flex-1 text-center group cursor-pointer">
                               <div className="mb-2 relative inline-block">
-                                <div className="w-16 h-16 mx-auto rounded-full bg-gray-100 flex items-center justify-center border-2 border-gray-100 group-hover:border-primary/30 transition-colors overflow-hidden">
+                                <div className="w-16 h-16 mx-auto rounded-full bg-zinc-800 flex items-center justify-center border-2 border-zinc-700 group-hover:border-primary/50 transition-colors overflow-hidden">
                                   {/* Placeholder pour photo */}
-                                  <Users className="w-8 h-8 text-gray-400" />
+                                  <Users className="w-8 h-8 text-zinc-500" />
                                 </div>
                               </div>
-                              <h3 className="font-bold text-gray-900 text-sm md:text-base leading-tight">
+                              <h3 className="font-bold text-gray-100 text-sm md:text-base leading-tight">
                                 {bet.fight.fighterA.name}
                               </h3>
                               {bet.fight.fighterA.nickname && (
@@ -586,7 +586,7 @@ export default function AvailableBets() {
 
                             {/* VS Badge */}
                             <div className="flex flex-col items-center justify-center pb-6 z-10">
-                              <div className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-black shadow-lg ring-4 ring-white">
+                              <div className="w-8 h-8 rounded-full bg-zinc-800 text-gray-400 border border-zinc-700 flex items-center justify-center text-xs font-black shadow-lg shadow-black/30">
                                 VS
                               </div>
                             </div>
@@ -594,11 +594,11 @@ export default function AvailableBets() {
                             {/* Lutteur B */}
                             <div className="flex-1 text-center group cursor-pointer">
                               <div className="mb-2 relative inline-block">
-                                <div className="w-16 h-16 mx-auto rounded-full bg-gray-100 flex items-center justify-center border-2 border-gray-100 group-hover:border-primary/30 transition-colors overflow-hidden">
-                                  <Users className="w-8 h-8 text-gray-400" />
+                                <div className="w-16 h-16 mx-auto rounded-full bg-zinc-800 flex items-center justify-center border-2 border-zinc-700 group-hover:border-primary/50 transition-colors overflow-hidden">
+                                  <Users className="w-8 h-8 text-zinc-500" />
                                 </div>
                               </div>
-                              <h3 className="font-bold text-gray-900 text-sm md:text-base leading-tight">
+                              <h3 className="font-bold text-gray-100 text-sm md:text-base leading-tight">
                                 {bet.fight.fighterB.name}
                               </h3>
                               {bet.fight.fighterB.nickname && (
@@ -611,19 +611,19 @@ export default function AvailableBets() {
 
                           {/* Lieu */}
                           <div className="flex items-center justify-center gap-2 mb-6">
-                            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-full">
-                              <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                              <span className="text-xs font-medium text-gray-600">{bet.fight.location}</span>
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800/50 border border-white/5 rounded-full">
+                              <MapPin className="w-3.5 h-3.5 text-zinc-400" />
+                              <span className="text-xs font-medium text-zinc-400">{bet.fight.location}</span>
                             </div>
                           </div>
 
                           {/* Choix du parieur (Highlight) */}
-                          <div className="bg-blue-50/50 rounded-xl p-4 mb-6 border border-blue-100/50 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-2 opacity-10">
-                              <Target className="w-16 h-16 text-blue-600" />
+                          <div className="bg-blue-950/20 rounded-xl p-4 mb-6 border border-blue-900/30 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-2 opacity-5">
+                              <Target className="w-16 h-16 text-blue-400" />
                             </div>
                             <div className="relative z-10 flex flex-col items-center">
-                              <p className="text-xs uppercase tracking-widest text-blue-600 font-semibold mb-1">
+                              <p className="text-xs uppercase tracking-widest text-blue-400 font-semibold mb-1">
                                 {bet.creator.name} a misé sur
                               </p>
                               <div className="flex items-center gap-2">
@@ -639,17 +639,17 @@ export default function AvailableBets() {
 
                           {/* Grid Montants */}
                           <div className="grid grid-cols-2 gap-3 mb-6">
-                            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100 flex flex-col items-center justify-center text-center">
-                              <span className="text-xs text-gray-500 font-medium mb-1 uppercase tracking-wide">Mise</span>
-                              <span className="text-lg font-black text-gray-900">
-                                {formatAmount(bet.amount)} <span className="text-xs font-bold text-gray-400">FCFA</span>
+                            <div className="bg-zinc-800 rounded-xl p-3 border border-zinc-700 flex flex-col items-center justify-center text-center">
+                              <span className="text-xs text-gray-400 font-medium mb-1 uppercase tracking-wide">Mise</span>
+                              <span className="text-lg font-black text-gray-100">
+                                {formatAmount(bet.amount)} <span className="text-xs font-bold text-zinc-500">FCFA</span>
                               </span>
                             </div>
-                            <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                            <div className="bg-emerald-950/20 rounded-xl p-3 border border-emerald-900/30 flex flex-col items-center justify-center text-center relative overflow-hidden">
                               <div className="absolute inset-0 bg-emerald-500/5 -skew-x-12 transform"></div>
-                              <span className="text-xs text-emerald-600 font-medium mb-1 uppercase tracking-wide">Gain</span>
-                              <span className="text-lg font-black text-emerald-700 relative z-10">
-                                {formatAmount(potentialWin)} <span className="text-xs font-bold text-emerald-500">FCFA</span>
+                              <span className="text-xs text-emerald-400 font-medium mb-1 uppercase tracking-wide">Gain</span>
+                              <span className="text-lg font-black text-emerald-400 relative z-10">
+                                {formatAmount(potentialWin)} <span className="text-xs font-bold text-emerald-600">FCFA</span>
                               </span>
                             </div>
                           </div>
@@ -658,7 +658,7 @@ export default function AvailableBets() {
                           <div className="flex flex-col sm:flex-row gap-3">
                             <Button
                               onClick={() => handleAcceptBet(bet.id)}
-                              className="flex-1 h-12 text-sm font-bold shadow-lg shadow-primary/20 bg-gradient-to-r from-primary to-primary/90 hover:brightness-105 active:scale-[0.98] transition-all rounded-xl"
+                              className="flex-1 h-11 text-sm font-bold shadow-lg shadow-primary/20 bg-gradient-to-r from-primary to-primary/90 hover:brightness-110 active:scale-[0.98] transition-all rounded-xl text-white border-0"
                               disabled={!canAccept}
                             >
                               <Zap className="w-4 h-4 mr-2 fill-current" />
@@ -666,7 +666,7 @@ export default function AvailableBets() {
                             </Button>
 
                             <Link to={`/fights/${bet.fight.id}`} className="sm:w-auto w-full">
-                              <Button variant="outline" className="w-full h-12 border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold rounded-xl">
+                              <Button variant="outline" className="w-full h-11 border-zinc-700 hover:bg-zinc-800 text-zinc-300 hover:text-white font-semibold rounded-xl bg-transparent">
                                 Détails
                               </Button>
                             </Link>
