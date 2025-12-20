@@ -84,7 +84,7 @@ export function CancelBetButton({ betId, canCancelUntil, onCancel }: CancelBetBu
                 <div className="flex items-center gap-2">
                     <Clock className={`w-4 h-4 ${getTimeColor()}`} />
                     <div>
-                        <p className="text-xs text-muted-foreground">Temps restant pour annuler</p>
+                        <p className="text-xs text-muted-foreground">Temps pour annuler (max 20min)</p>
                         <p className={`text-sm font-bold ${getTimeColor()}`}>
                             {isExpired ? 'Expiré' : formatted}
                         </p>
