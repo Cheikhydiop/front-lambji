@@ -48,12 +48,11 @@ export default function Auth({ type }: AuthProps = {}) {
           return;
         }
 
-        // Validation mot de passe fort
-        const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-        if (!strongPasswordRegex.test(formData.password)) {
+        // Validation mot de passe simple (min 4 caractères)
+        if (formData.password.length < 4) {
           toast({
-            title: 'Mot de passe trop faible',
-            description: 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre.',
+            title: 'Mot de passe trop court',
+            description: 'Le mot de passe doit contenir au moins 4 caractères.',
             variant: 'destructive',
           });
           setIsLoading(false);
@@ -359,7 +358,7 @@ export default function Auth({ type }: AuthProps = {}) {
               </div>
               {(mode === 'register' || mode === 'reset') && (
                 <p className="text-xs text-muted-foreground ml-1">
-                  💡 Pour votre sécurité : 8 caractères min., avec majuscule et chiffre.
+                  💡 4 caractères minimum.
                 </p>
               )}
             </div>
