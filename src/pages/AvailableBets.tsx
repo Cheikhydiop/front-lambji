@@ -115,7 +115,7 @@ export default function AvailableBets() {
 
       const response = await betService.getAvailableBetPending();
 
-      if (response.success && response.data) {
+      if (response.data) {
         // Formater les données selon votre structure
         const formattedBets: FormattedBet[] = (response.data as any[]).map((bet: any) => ({
           id: bet.id,
@@ -261,6 +261,25 @@ export default function AvailableBets() {
         variant: 'destructive',
       });
       return;
+    }
+
+    const bet = bets.find(b => b.id === betId);
+    if (!bet) return;
+
+    // Check for sufficient balance
+    if (user?.wallet?.balance !== undefined) {
+      // Ensure we compare numbers
+      const balance = Number(user.wallet.balance);
+      const amount = Number(bet.amount);
+
+      if (balance < amount) {
+        toast({
+          title: 'Solde insuffisant',
+          description: `Votre solde (${formatAmount(balance)} FCFA) est insuffisant pour accepter ce pari de ${formatAmount(amount)} FCFA.`,
+          variant: 'destructive',
+        });
+        return;
+      }
     }
 
     try {
@@ -415,8 +434,8 @@ export default function AvailableBets() {
                   key={option.value}
                   onClick={() => setFilterType(option.value)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${filterType === option.value
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -644,8 +663,11 @@ export default function AvailableBets() {
                 <p className="text-gray-500 mb-6">
                   {searchQuery
                     ? `Aucun résultat pour "${searchQuery}"`
-                    : 'Aucun pari en attente d\'acceptation pour le moment'
+                    : "Aucun pari en attente d'acceptation d'autres joueurs."
                   }
+                </p>
+                <p className="text-sm text-gray-400 mb-6">
+                  (Vos propres paris sont visibles dans "Mes Paris")
                 </p>
                 {searchQuery && (
                   <Button
