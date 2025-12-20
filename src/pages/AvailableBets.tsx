@@ -518,136 +518,159 @@ export default function AvailableBets() {
                   const canAccept = canAcceptBet(bet.canCancelUntil || '');
 
                   return (
-                    <Card key={bet.id} className="border shadow-sm hover:shadow-md transition-all hover:border-primary/50">
-                      <CardContent className="p-4">
-                        {/* En-tête */}
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                              {bet.creator.name.charAt(0)}
+                    <Card key={bet.id} className="border-0 shadow-md hover:shadow-xl transition-all duration-300 bg-white rounded-2xl overflow-hidden ring-1 ring-black/5">
+                      {/* En-tête de carte avec dégradé subtil */}
+                      <div className="bg-gradient-to-r from-slate-50 to-white p-4 border-b border-gray-100">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="relative">
+                              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold shadow-sm ring-2 ring-white">
+                                {bet.creator.name.charAt(0)}
+                              </div>
+                              {/* Indicateur en ligne optionnel */}
+                              <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
                             </div>
                             <div>
-                              <p className="font-medium">{bet.creator.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {formatTimeAgo(bet.createdAt)}
-                              </p>
-                            </div>
-                          </div>
-                          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-                            <Clock className="w-3 h-3 mr-1" />
-                            EN ATTENTE
-                          </Badge>
-                        </div>
-
-                        {/* Événement */}
-                        <div className="mb-2">
-                          <Badge variant="secondary" className="mb-2">
-                            <Calendar className="w-3 h-3 mr-1" />
-                            {bet.fight.dayEvent.title}
-                          </Badge>
-                        </div>
-
-                        {/* Combat */}
-                        <div className="mb-4">
-                          <h3 className="font-bold mb-1 text-lg">{bet.fight.title}</h3>
-                          <div className="flex items-center justify-between mb-2">
-                            <MapPin className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-sm text-muted-foreground">{bet.fight.location}</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <div className="text-center flex-1">
-                              <p className="text-sm font-medium">{bet.fight.fighterA.name}</p>
-                              {bet.fight.fighterA.nickname && (
-                                <p className="text-xs text-muted-foreground">"{bet.fight.fighterA.nickname}"</p>
-                              )}
-                              <div className="text-xs text-muted-foreground mt-1">
-                                {bet.fight.fighterA.weight}kg • {bet.fight.fighterA.height}cm
-                              </div>
-                            </div>
-                            <div className="px-2">
-                              <Badge variant="outline" className="font-bold">VS</Badge>
-                            </div>
-                            <div className="text-center flex-1">
-                              <p className="text-sm font-medium">{bet.fight.fighterB.name}</p>
-                              {bet.fight.fighterB.nickname && (
-                                <p className="text-xs text-muted-foreground">"{bet.fight.fighterB.nickname}"</p>
-                              )}
-                              <div className="text-xs text-muted-foreground mt-1">
-                                {bet.fight.fighterB.weight}kg • {bet.fight.fighterB.height}cm
+                              <p className="font-bold text-gray-900 leading-tight">{bet.creator.name}</p>
+                              <div className="flex items-center gap-1.5 mt-0.5">
+                                <Clock className="w-3 h-3 text-gray-400" />
+                                <p className="text-xs text-gray-500 font-medium">
+                                  {formatTimeAgo(bet.createdAt)}
+                                </p>
                               </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* Choix du créateur */}
-                        <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg mb-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <Target className="w-4 h-4 text-blue-600" />
-                              <span className="font-medium text-blue-600">Parie sur :</span>
-                            </div>
-                            <Badge className={
-                              isChosenFighterA
-                                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
-                                : 'bg-gradient-to-r from-red-500 to-red-600 text-white'
-                            }>
-                              {chosenFighter.name}
+                          {/* Badge de statut ou compte à rebours */}
+                          {bet.canCancelUntil ? (
+                            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 font-medium px-2 py-0.5">
+                              ⏳ {new Date(bet.canCancelUntil).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary" className="bg-gray-100 text-gray-600 font-medium">
+                              En attente
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      <CardContent className="p-0">
+                        {/* Section Combat */}
+                        <div className="p-5">
+                          {/* Événement */}
+                          <div className="flex justify-center mb-4">
+                            <Badge className="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0 shadow-sm px-3 py-1 text-xs uppercase tracking-wide">
+                              {bet.fight.dayEvent.title}
                             </Badge>
                           </div>
-                          {chosenFighter.nickname && (
-                            <p className="text-sm text-blue-600 mt-1">"{chosenFighter.nickname}"</p>
-                          )}
-                          <div className="text-xs text-muted-foreground mt-2">
-                            Opposé à: {opponentFighter.name}
-                          </div>
-                        </div>
 
-                        {/* Montants */}
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                          <div className="text-center p-3 bg-gray-50 rounded-lg">
-                            <p className="text-sm text-muted-foreground mb-1">Mise du créateur</p>
-                            <div className="flex items-center justify-center">
-                              <DollarSign className="w-4 h-4 text-green-600 mr-1" />
-                              <p className="text-xl font-bold text-foreground">{formatAmount(bet.amount)} FCFA</p>
+                          {/* Lutteurs */}
+                          <div className="flex items-end justify-between gap-2 mb-6 relative">
+                            {/* Lutteur A */}
+                            <div className="flex-1 text-center group cursor-pointer">
+                              <div className="mb-2 relative inline-block">
+                                <div className="w-16 h-16 mx-auto rounded-full bg-gray-100 flex items-center justify-center border-2 border-gray-100 group-hover:border-primary/30 transition-colors overflow-hidden">
+                                  {/* Placeholder pour photo */}
+                                  <Users className="w-8 h-8 text-gray-400" />
+                                </div>
+                              </div>
+                              <h3 className="font-bold text-gray-900 text-sm md:text-base leading-tight">
+                                {bet.fight.fighterA.name}
+                              </h3>
+                              {bet.fight.fighterA.nickname && (
+                                <p className="text-xs text-primary font-medium mt-0.5">
+                                  "{bet.fight.fighterA.nickname}"
+                                </p>
+                              )}
+                            </div>
+
+                            {/* VS Badge */}
+                            <div className="flex flex-col items-center justify-center pb-6 z-10">
+                              <div className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-black shadow-lg ring-4 ring-white">
+                                VS
+                              </div>
+                            </div>
+
+                            {/* Lutteur B */}
+                            <div className="flex-1 text-center group cursor-pointer">
+                              <div className="mb-2 relative inline-block">
+                                <div className="w-16 h-16 mx-auto rounded-full bg-gray-100 flex items-center justify-center border-2 border-gray-100 group-hover:border-primary/30 transition-colors overflow-hidden">
+                                  <Users className="w-8 h-8 text-gray-400" />
+                                </div>
+                              </div>
+                              <h3 className="font-bold text-gray-900 text-sm md:text-base leading-tight">
+                                {bet.fight.fighterB.name}
+                              </h3>
+                              {bet.fight.fighterB.nickname && (
+                                <p className="text-xs text-primary font-medium mt-0.5">
+                                  "{bet.fight.fighterB.nickname}"
+                                </p>
+                              )}
                             </div>
                           </div>
-                          <div className="text-center p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg">
-                            <p className="text-sm text-muted-foreground mb-1">Votre gain potentiel</p>
-                            <div className="flex items-center justify-center">
-                              <TrendingUp className="w-4 h-4 text-emerald-600 mr-1" />
-                              <p className="text-xl font-bold text-emerald-600">
-                                {formatAmount(potentialWin)} FCFA
+
+                          {/* Lieu */}
+                          <div className="flex items-center justify-center gap-2 mb-6">
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-full">
+                              <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                              <span className="text-xs font-medium text-gray-600">{bet.fight.location}</span>
+                            </div>
+                          </div>
+
+                          {/* Choix du parieur (Highlight) */}
+                          <div className="bg-blue-50/50 rounded-xl p-4 mb-6 border border-blue-100/50 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-2 opacity-10">
+                              <Target className="w-16 h-16 text-blue-600" />
+                            </div>
+                            <div className="relative z-10 flex flex-col items-center">
+                              <p className="text-xs uppercase tracking-widest text-blue-600 font-semibold mb-1">
+                                {bet.creator.name} a misé sur
                               </p>
+                              <div className="flex items-center gap-2">
+                                <Badge className={`text-sm px-4 py-1.5 shadow-sm ${isChosenFighterA
+                                  ? 'bg-blue-600 hover:bg-blue-700'
+                                  : 'bg-red-600 hover:bg-red-700'
+                                  } border-0`}>
+                                  {chosenFighter.name}
+                                </Badge>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* Limite d'annulation */}
-                        {bet.canCancelUntil && (
-                          <div className="mb-4 p-2 bg-orange-50 border border-orange-200 rounded-lg text-center">
-                            <p className="text-xs text-orange-700">
-                              ⏰ Le créateur peut annuler ce pari jusqu'à {new Date(bet.canCancelUntil).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                            </p>
+                          {/* Grid Montants */}
+                          <div className="grid grid-cols-2 gap-3 mb-6">
+                            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100 flex flex-col items-center justify-center text-center">
+                              <span className="text-xs text-gray-500 font-medium mb-1 uppercase tracking-wide">Mise</span>
+                              <span className="text-lg font-black text-gray-900">
+                                {formatAmount(bet.amount)} <span className="text-xs font-bold text-gray-400">FCFA</span>
+                              </span>
+                            </div>
+                            <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                              <div className="absolute inset-0 bg-emerald-500/5 -skew-x-12 transform"></div>
+                              <span className="text-xs text-emerald-600 font-medium mb-1 uppercase tracking-wide">Gain</span>
+                              <span className="text-lg font-black text-emerald-700 relative z-10">
+                                {formatAmount(potentialWin)} <span className="text-xs font-bold text-emerald-500">FCFA</span>
+                              </span>
+                            </div>
                           </div>
-                        )}
 
-                        {/* Boutons d'action */}
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={() => handleAcceptBet(bet.id)}
-                            className="flex-1"
-                            size="lg"
-                            disabled={!canAccept}
-                            variant={canAccept ? "default" : "secondary"}
-                          >
-                            <Zap className="w-4 h-4 mr-2" />
-                            {canAccept ? 'Accepter ce pari' : 'Non disponible'}
-                          </Button>
-                          <Link to={`/fights/${bet.fight.id}`} className="flex-1">
-                            <Button variant="outline" className="w-full">
-                              Voir le combat
+                          {/* Boutons Actions */}
+                          <div className="flex flex-col sm:flex-row gap-3">
+                            <Button
+                              onClick={() => handleAcceptBet(bet.id)}
+                              className="flex-1 h-12 text-sm font-bold shadow-lg shadow-primary/20 bg-gradient-to-r from-primary to-primary/90 hover:brightness-105 active:scale-[0.98] transition-all rounded-xl"
+                              disabled={!canAccept}
+                            >
+                              <Zap className="w-4 h-4 mr-2 fill-current" />
+                              {canAccept ? 'Relever le défi' : 'Indisponible'}
                             </Button>
-                          </Link>
+
+                            <Link to={`/fights/${bet.fight.id}`} className="sm:w-auto w-full">
+                              <Button variant="outline" className="w-full h-12 border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold rounded-xl">
+                                Détails
+                              </Button>
+                            </Link>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
