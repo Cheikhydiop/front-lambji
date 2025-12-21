@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Ticket, TrendingUp, TrendingDown, Clock, Plus, Filter, RefreshCw, User, Trophy, Calendar, Swords } from 'lucide-react';
+import { Ticket, TrendingUp, TrendingDown, Clock, Plus, Filter, RefreshCw, User, Trophy, Calendar, Swords, ChevronRight } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { BetCard } from '@/components/bets/BetCard';
 import { CancelBetButton } from '@/components/bets/CancelBetButton';
@@ -453,31 +453,42 @@ export default function MyBets() {
                   const isUserCreator = bet.userRole === 'creator';
 
                   return (
-                    <Card key={bet.id} className="border shadow-sm hover:shadow-md transition-shadow">
-                      <CardContent className="p-4">
-                        {/* En-tête du pari */}
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            <Badge className={getStatusColor(bet.status)}>
-                              {getStatusLabel(bet.status)}
-                            </Badge>
-                            <span className="text-xs text-muted-foreground">
-                              {formatDate(bet.createdAt)}
-                            </span>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm text-muted-foreground">Vous êtes</p>
-                            <Badge variant="outline" className="text-xs">
-                              {isUserCreator ? 'Créateur' : 'Accepteur'}
+                    <Card key={bet.id} className="border-0 shadow-lg shadow-black/20 hover:shadow-black/40 transition-all duration-300 bg-[#1a1b1e] rounded-2xl overflow-hidden ring-1 ring-white/5">
+                      <CardContent className="p-0">
+                        {/* En-tête avec statut et date */}
+                        <div className="bg-gradient-to-r from-zinc-800/50 to-[#1a1b1e] p-4 border-b border-white/5">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Badge className={`${getStatusColor(bet.status)} border-0 shadow-sm`}>
+                                {getStatusLabel(bet.status)}
+                              </Badge>
+                              <div className="flex items-center gap-1.5 text-xs text-gray-400 font-medium ml-1">
+                                <Calendar className="w-3 h-3" />
+                                {formatDate(bet.createdAt)}
+                              </div>
+                            </div>
+
+                            <Badge variant="outline" className={`text-xs border-zinc-700 bg-zinc-800/50 ${isUserCreator ? 'text-blue-400' : 'text-purple-400'}`}>
+                              {isUserCreator ? 'Vous avez créé' : 'Vous avez accepté'}
                             </Badge>
                           </div>
                         </div>
 
-                        {/* Informations du combat */}
-                        <div className="mb-3">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Swords className="w-4 h-4 text-muted-foreground" />
-                            <h3 className="font-bold">{bet.fight?.title}</h3>
+                        {/* Section principale */}
+                        <div className="p-5">
+                          {/* Titre du combat */}
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center border border-zinc-700 text-gray-400">
+                              <Swords className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <h3 className="font-bold text-gray-100 text-lg leading-tight">{bet.fight?.title || 'Combat inconnu'}</h3>
+                              {bet.fight?.dayEvent && (
+                                <p className="text-xs text-primary font-medium mt-0.5">
+                                  {bet.fight.dayEvent.title}
+                                </p>
+                              )}
+                            </div>
                           </div>
                           <div className="flex items-center gap-4 text-sm">
                             <div className="flex items-center gap-1">
@@ -514,23 +525,30 @@ export default function MyBets() {
                         </div>
 
                         {/* Informations financières */}
+                        {/* Informations financières */}
                         {(bet.actualWin || bet.potentialWin) && (
-                          <div className={`p-3 rounded-lg mb-3 ${bet.status === 'WON' ? 'bg-green-50' :
-                            bet.status === 'LOST' ? 'bg-red-50' : 'bg-blue-50'
+                          <div className={`p-4 rounded-xl mb-4 relative overflow-hidden flex items-center justify-between ${bet.status === 'WON' ? 'bg-emerald-950/20 ring-1 ring-emerald-900/30' :
+                              bet.status === 'LOST' ? 'bg-red-950/20 ring-1 ring-red-900/30' :
+                                'bg-blue-950/20 ring-1 ring-blue-900/30'
                             }`}>
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className="text-sm font-medium">
-                                  {bet.status === 'WON' ? 'Gain réalisé' :
-                                    bet.status === 'LOST' ? 'Perte' : 'Gain potentiel'}
-                                </p>
-                              </div>
-                              <p className={`text-lg font-bold ${bet.status === 'WON' ? 'text-green-700' :
-                                bet.status === 'LOST' ? 'text-red-700' : 'text-blue-700'
+                            <div className={`absolute inset-0 opacity-10 ${bet.status === 'WON' ? 'bg-emerald-500' :
+                                bet.status === 'LOST' ? 'bg-red-500' : 'bg-blue-500'
+                              }`}></div>
+
+                            <div className="relative z-10">
+                              <p className={`text-xs font-bold uppercase tracking-wide mb-0.5 ${bet.status === 'WON' ? 'text-emerald-500' :
+                                  bet.status === 'LOST' ? 'text-red-500' : 'text-blue-500'
                                 }`}>
-                                {formatAmount(bet.actualWin || bet.potentialWin || 0)} FCFA
+                                {bet.status === 'WON' ? 'Gain réalisé' :
+                                  bet.status === 'LOST' ? 'Perte' : 'Gain potentiel'}
                               </p>
                             </div>
+
+                            <p className={`relative z-10 text-xl font-black ${bet.status === 'WON' ? 'text-emerald-400' :
+                                bet.status === 'LOST' ? 'text-red-400' : 'text-blue-400'
+                              }`}>
+                              {formatAmount(bet.actualWin || bet.potentialWin || 0)} <span className="text-xs">FCFA</span>
+                            </p>
                           </div>
                         )}
 
