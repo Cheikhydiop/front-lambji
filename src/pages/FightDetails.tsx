@@ -177,6 +177,19 @@ export default function FightDetails() {
       return;
     }
 
+    // Vérifier le solde disponible
+    if (user?.wallet?.balance !== undefined) {
+      const balance = Number(user.wallet.balance);
+      if (balance < amount) {
+        toast({
+          title: 'Solde insuffisant',
+          description: `Votre solde (${balance.toLocaleString()} FCFA) est insuffisant pour miser ${amount.toLocaleString()} FCFA.`,
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
+
     setIsCreatingBet(true);
     try {
       await betService.createBet({
@@ -221,6 +234,22 @@ export default function FightDetails() {
       });
       navigate('/auth');
       return;
+    }
+
+    // Trouver le pari pour vérifier le montant
+    const bet = availableBets.find(b => b.id === betId);
+    if (bet && user?.wallet?.balance !== undefined) {
+      const balance = Number(user.wallet.balance);
+      const amount = Number(bet.amount);
+
+      if (balance < amount) {
+        toast({
+          title: 'Solde insuffisant',
+          description: `Votre solde (${balance.toLocaleString()} FCFA) est insuffisant pour accepter ce pari de ${amount.toLocaleString()} FCFA.`,
+          variant: 'destructive',
+        });
+        return;
+      }
     }
 
     try {
