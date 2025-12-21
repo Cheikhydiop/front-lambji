@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { Bell, ChevronRight, Flame, Calendar, Trophy } from 'lucide-react';
+import { toast } from 'sonner';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { FightCard } from '@/components/fights/FightCard';
 import { EventCard } from '@/components/fights/EventCard';
@@ -60,6 +62,7 @@ const mockEvents = [
 
 export default function Index() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [fights, setFights] = useState<any[]>(mockFights);
   const [events, setEvents] = useState<any[]>(mockEvents);
   const [isLoading, setIsLoading] = useState(false);
@@ -82,7 +85,22 @@ export default function Index() {
     };
 
     fetchData();
+    fetchData();
   }, []);
+
+  const handleAuthCheck = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      toast.info("Connectez-vous pour voir les détails", {
+        description: "Créez un compte gratuitement pour parier et suivre les combats.",
+        action: {
+          label: "Connexion",
+          onClick: () => navigate('/auth')
+        }
+      });
+      navigate('/auth');
+    }
+  };
 
   if (authLoading) {
     return <PageLoader />;
@@ -163,7 +181,7 @@ export default function Index() {
           </div>
           <div className="space-y-3">
             {events.slice(0, 2).map((event) => (
-              <EventCard key={event.id} {...event} />
+              <EventCard key={event.id} {...event} onClick={handleAuthCheck} />
             ))}
           </div>
         </section>
@@ -181,7 +199,7 @@ export default function Index() {
           </div>
           <div className="space-y-4">
             {fights.slice(0, 3).map((fight) => (
-              <FightCard key={fight.id} {...fight} />
+              <FightCard key={fight.id} {...fight} onClick={handleAuthCheck} />
             ))}
           </div>
         </section>

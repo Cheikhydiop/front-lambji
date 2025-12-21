@@ -30,6 +30,7 @@ interface FightCardProps {
   showLocation?: boolean;
   showEvent?: boolean;
   eventName?: string;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 export function FightCard({
@@ -48,6 +49,7 @@ export function FightCard({
   showLocation = false,
   showEvent = false,
   eventName,
+  onClick,
 }: FightCardProps) {
   const isLive = status === 'ONGOING';
   const isScheduled = status === 'SCHEDULED';
@@ -56,6 +58,7 @@ export function FightCard({
   return (
     <Link
       to={`/fights/${id}`}
+      onClick={onClick}
       className="block bg-gradient-card rounded-2xl p-4 shadow-card hover:shadow-elevated transition-all duration-300 active:scale-[0.98]"
     >
       {/* Header */}

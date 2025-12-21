@@ -42,7 +42,11 @@ export function BetCard({
   onAccept,
   onCancel,
 }: BetCardProps) {
-  const chosenFighterName = chosenFighter === 'A' ? fight.fighterA.name : fight.fighterB.name;
+  // Determine visual selection based on role
+  const dbChosenA = chosenFighter === 'A';
+  // If creator (or undefined), my choice matches db. If acceptor (isCreator is false), my choice is opposite.
+  const mySideIsA = (isCreator ?? true) ? dbChosenA : !dbChosenA;
+  const chosenFighterName = mySideIsA ? fight.fighterA.name : fight.fighterB.name;
   const statusInfo = statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
 
   return (

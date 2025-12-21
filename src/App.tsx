@@ -13,6 +13,8 @@ import EmailVerification from "./pages/EmailVerification";
 import DeviceVerification from "./pages/DeviceVerification";
 import Fights from "./pages/Fights";
 import FightDetails from "./pages/FightDetails";
+import Events from "./pages/Events";
+import EventDetails from "./pages/EventDetails";
 import MyBets from "./pages/MyBets";
 import AvailableBets from "./pages/AvailableBets"; // NOUVELLE PAGE
 import WalletPage from "./pages/WalletPage";
@@ -76,6 +78,9 @@ const App = () => (
                 <Route path="/fights" element={<Fights />} />
                 <Route path="/fights/:id" element={<FightDetails />} />
                 <Route path="/fight/:id" element={<FightDetails />} />
+
+                <Route path="/events" element={<Events />} />
+                <Route path="/events/:id" element={<EventDetails />} />
 
                 <Route path="/my-bets" element={<MyBets />} />
                 <Route path="/available-bets" element={<AvailableBets />} />
