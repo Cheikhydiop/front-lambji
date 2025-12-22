@@ -23,8 +23,14 @@ export default function Wallet({ tab }: { tab?: string }) {
   const [action, setAction] = useState<ActionType>((tab as ActionType) || null);
   const [amount, setAmount] = useState('');
   const [selectedProvider, setSelectedProvider] = useState('WAVE');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(user?.phone || '');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+
+  useEffect(() => {
+    if (user?.phone) {
+      setPhone(user.phone);
+    }
+  }, [user]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [processing, setProcessing] = useState(false);
 
@@ -275,6 +281,8 @@ export default function Wallet({ tab }: { tab?: string }) {
                     placeholder="77 123 45 67"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
+                    disabled={!!user?.phone}
+                    className={user?.phone ? "bg-muted opacity-100" : ""}
                   />
                 </div>
               )}
