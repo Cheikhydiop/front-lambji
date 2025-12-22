@@ -1,22 +1,30 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Settings, LogOut, ChevronRight, Shield, Bell, HelpCircle, FileText } from 'lucide-react';
+import { User, Settings, LogOut, ChevronRight, Shield, Bell, HelpCircle, FileText, ArrowLeft, Check, Trash2 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useNotifications } from '@/contexts/NotificationContext';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale';
+
+interface ProfileProps {
+  tab?: string;
+}
 
 const menuItems = [
   { icon: Bell, label: 'Notifications', path: '/notifications' },
-  { icon: Shield, label: 'Sécurité', path: '/security' },
-  { icon: Settings, label: 'Paramètres', path: '/settings' },
+  { icon: Shield, label: 'Sécurité', path: '/profile/security' },
+  { icon: Settings, label: 'Paramètres', path: '/profile/settings' },
   { icon: HelpCircle, label: 'Aide & Support', path: '/help' },
-  { icon: FileText, label: 'Conditions d\'utilisation', path: '/terms' },
 ];
 
-export default function Profile() {
+export default function Profile({ tab }: ProfileProps) {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { notifications, markAsRead, deleteNotification, markAllAsRead } = useNotifications();
 
   const handleLogout = async () => {
     await logout();
@@ -25,6 +33,17 @@ export default function Profile() {
       description: 'À bientôt!',
     });
     navigate('/');
+  };
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'BET_WON': return '🎉';
+      case 'BET_LOST': return '😔';
+      case 'DEPOSIT_SUCCESS': return '💰';
+      case 'FIGHT_FINISHED': return '⚔️';
+      case 'NEW_BET_AVAILABLE': return '📢';
+      default: return '🔔';
+    }
   };
 
   if (!isAuthenticated) {
@@ -49,6 +68,97 @@ export default function Profile() {
     );
   }
 
+  // View: Notifications History
+  if (tab === 'notifications') {
+    return (
+      <AppLayout>
+        <div className="safe-top h-screen flex flex-col">
+          {/* Header */}
+          <header className="px-4 py-4 flex items-center justify-between border-b bg-background sticky top-0 z-10">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={() => navigate('/profile')}>
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <h1 className="text-xl font-bold">Notifications</h1>
+            </div>
+            {notifications.length > 0 && (
+              <Button variant="ghost" size="sm" onClick={() => markAllAsRead()}>
+                Tout lire
+              </Button>
+            )}
+          </header>
+
+          {/* List */}
+          <ScrollArea className="flex-1 px-4 py-2">
+            {notifications.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+                <Bell className="h-16 w-16 mb-4 opacity-20" />
+                <p>Aucune notification</p>
+              </div>
+            ) : (
+              <div className="space-y-3 pb-20">
+                {notifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    className={`p-4 rounded-xl border transition-all ${!notification.isRead
+                        ? 'bg-primary/5 border-primary/20 shadow-sm'
+                        : 'bg-card border-border/50'
+                      }`}
+                  >
+                    <div className="flex gap-4">
+                      <div className="text-3xl pt-1">
+                        {getNotificationIcon(notification.type)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start gap-2">
+                          <h4 className={`text-sm font-semibold ${!notification.isRead ? 'text-primary' : 'text-foreground'}`}>
+                            {notification.title}
+                          </h4>
+                          <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                            {formatDistanceToNow(new Date(notification.createdAt), {
+                              addSuffix: true,
+                              locale: fr,
+                            })}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1 leading-snug">
+                          {notification.message}
+                        </p>
+
+                        {/* Actions */}
+                        <div className="flex justify-end gap-2 mt-3 pt-2 border-t border-dashed border-border/50">
+                          {!notification.isRead && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 text-xs"
+                              onClick={() => markAsRead(notification.id)}
+                            >
+                              <Check className="w-3 h-3 mr-1" /> Marquer lu
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 text-xs text-destructive hover:text-destructive"
+                            onClick={() => deleteNotification(notification.id)}
+                          >
+                            <Trash2 className="w-3 h-3 mr-1" /> Supprimer
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Default View: Profile Menu
   return (
     <AppLayout>
       <div className="safe-top">
@@ -116,9 +226,8 @@ export default function Profile() {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center justify-between p-4 hover:bg-muted/50 transition-colors ${
-                    index !== menuItems.length - 1 ? 'border-b border-border' : ''
-                  }`}
+                  className={`flex items-center justify-between p-4 hover:bg-muted/50 transition-colors ${index !== menuItems.length - 1 ? 'border-b border-border' : ''
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-muted rounded-lg">
