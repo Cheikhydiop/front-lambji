@@ -14,9 +14,7 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 type ActionType = 'deposit' | 'withdraw' | null;
 
 const providers = [
-  { id: 'WAVE', name: 'Wave', color: 'bg-blue-500' },
-  { id: 'ORANGE_MONEY', name: 'Orange Money', color: 'bg-orange-500' },
-  { id: 'FREE_MONEY', name: 'Free Money', color: 'bg-green-500' },
+  { id: 'WAVE', name: 'Wave', color: 'bg-[#1dc0ed]' },
 ];
 
 export default function Wallet({ tab }: { tab?: string }) {
@@ -160,24 +158,39 @@ export default function Wallet({ tab }: { tab?: string }) {
 
         {/* Actions */}
         <div className="px-4 py-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <Button
-              variant={action === 'deposit' ? 'gold' : 'outline'}
+              variant={action === 'deposit' ? 'default' : 'outline'}
               size="lg"
-              className="flex items-center gap-2"
+              className={cn(
+                "h-24 flex flex-col items-center justify-center gap-2 rounded-2xl border-2 transition-all",
+                action === 'deposit'
+                  ? "bg-emerald-600 hover:bg-emerald-700 border-emerald-500 text-white ring-2 ring-emerald-500/30"
+                  : "border-zinc-700 hover:border-emerald-500/50 hover:bg-emerald-500/10"
+              )}
               onClick={() => setAction(action === 'deposit' ? null : 'deposit')}
             >
-              <ArrowDownLeft className="w-5 h-5" />
-              Déposer
+              <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                <Plus className="w-6 h-6 text-emerald-400" />
+              </div>
+              <span className="font-bold text-lg">Dépôt</span>
             </Button>
+
             <Button
-              variant={action === 'withdraw' ? 'secondary' : 'outline'}
+              variant={action === 'withdraw' ? 'default' : 'outline'}
               size="lg"
-              className="flex items-center gap-2"
+              className={cn(
+                "h-24 flex flex-col items-center justify-center gap-2 rounded-2xl border-2 transition-all",
+                action === 'withdraw'
+                  ? "bg-orange-600 hover:bg-orange-700 border-orange-500 text-white ring-2 ring-orange-500/30"
+                  : "border-zinc-700 hover:border-orange-500/50 hover:bg-orange-500/10"
+              )}
               onClick={() => setAction(action === 'withdraw' ? null : 'withdraw')}
             >
-              <ArrowUpRight className="w-5 h-5" />
-              Retirer
+              <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center">
+                <Minus className="w-6 h-6 text-orange-400" />
+              </div>
+              <span className="font-bold text-lg">Retrait</span>
             </Button>
           </div>
         </div>
@@ -192,23 +205,35 @@ export default function Wallet({ tab }: { tab?: string }) {
 
               {/* Provider Selection */}
               <div>
-                <label className="text-sm text-muted-foreground mb-2 block">
-                  Méthode de paiement
+                <label className="text-sm font-medium text-gray-300 mb-2 block">
+                  Moyen de paiement
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="flex flex-col gap-2">
                   {providers.map((provider) => (
                     <button
                       key={provider.id}
                       onClick={() => setSelectedProvider(provider.id)}
                       className={cn(
-                        "p-3 rounded-xl border-2 transition-all text-center flex flex-col items-center justify-center gap-2",
+                        "w-full p-4 rounded-xl border transition-all flex items-center justify-start gap-4 relative overflow-hidden group",
                         selectedProvider === provider.id
-                          ? "border-primary bg-primary/10"
-                          : "border-border"
+                          ? "border-[#1dc0ed] bg-[#1dc0ed]/10 ring-1 ring-[#1dc0ed]"
+                          : "border-zinc-700 bg-zinc-800 hover:border-zinc-500"
                       )}
                     >
-                      <div className={cn("w-8 h-8 rounded-full mb-1", provider.color)} />
-                      <span className="text-[10px] sm:text-xs font-medium text-foreground leading-tight">{provider.name}</span>
+                      <div className="w-12 h-12 rounded-full bg-[#1dc0ed] flex items-center justify-center shadow-lg shadow-[#1dc0ed]/20 shrink-0">
+                        {/* Logo Wave Stylisé */}
+                        <svg className="w-7 h-7 text-white fill-current" viewBox="0 0 24 24">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" />
+                        </svg>
+                      </div>
+                      <div className="text-left">
+                        <span className="text-sm font-bold text-white tracking-wide block">Wave Mobile Money</span>
+                        <span className="text-xs text-gray-400">Paiement rapide et sécurisé</span>
+                      </div>
+
+                      {selectedProvider === provider.id && (
+                        <div className="absolute top-3 right-3 w-3 h-3 rounded-full bg-[#1dc0ed] shadow-[0_0_8px_#1dc0ed]"></div>
+                      )}
                     </button>
                   ))}
                 </div>
