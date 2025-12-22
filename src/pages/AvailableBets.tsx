@@ -336,11 +336,10 @@ export default function AvailableBets() {
     return amount * 1.8;
   };
 
-  // Vérifier si le pari peut encore être accepté
-  const canAcceptBet = (canCancelUntil: string) => {
-    if (!canCancelUntil) return true;
-    const cancelTime = new Date(canCancelUntil);
-    return new Date() < cancelTime;
+  // Vérifier si le pari peut être accepté (basé sur la date du combat)
+  const canAcceptBet = (fight: FormattedBet['fight']) => {
+    if (fight.status !== 'SCHEDULED' && fight.status !== 'PENDING') return false;
+    return new Date() < new Date(fight.scheduledAt);
   };
 
   if (!isAuthenticated) {
@@ -515,7 +514,7 @@ export default function AvailableBets() {
                   const isChosenFighterA = bet.chosenFighter === 'A';
                   const chosenFighter = isChosenFighterA ? bet.fight.fighterA : bet.fight.fighterB;
                   const opponentFighter = isChosenFighterA ? bet.fight.fighterB : bet.fight.fighterA;
-                  const canAccept = canAcceptBet(bet.canCancelUntil || '');
+                  const canAccept = canAcceptBet(bet.fight);
 
                   return (
                     <Card key={bet.id} className="border-0 shadow-lg shadow-black/20 hover:shadow-black/40 transition-all duration-300 bg-[#1a1b1e] rounded-2xl overflow-hidden ring-1 ring-white/5">
