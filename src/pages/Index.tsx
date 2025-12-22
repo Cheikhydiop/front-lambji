@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { Bell, ChevronRight, Flame, Calendar, Trophy } from 'lucide-react';
+import { ChevronRight, Flame, Calendar, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { FightCard } from '@/components/fights/FightCard';
@@ -10,6 +10,7 @@ import { WalletBalance } from '@/components/common/WalletBalance';
 import { PageLoader } from '@/components/common/LoadingSpinner';
 import { useAuth } from '@/contexts/AuthContext';
 import { fightService } from '@/services';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 // Mock data for demo
 const mockFights = [
@@ -118,10 +119,7 @@ export default function Index() {
             </div>
             <div className="flex items-center gap-2">
               {isAuthenticated ? (
-                <Link to="/notifications" className="p-2.5 bg-muted rounded-xl relative">
-                  <Bell className="w-5 h-5 text-foreground" />
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full" />
-                </Link>
+                <NotificationBell />
               ) : (
                 <Link
                   to="/auth"

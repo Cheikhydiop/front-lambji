@@ -3,6 +3,7 @@ import { Notification, notificationService } from '../services/NotificationServi
 import { useAuth } from './AuthContext';
 import { io, Socket } from 'socket.io-client';
 import config from '../config';
+import { useToast } from '@/hooks/use-toast';
 
 interface NotificationContextType {
     notifications: Notification[];
@@ -30,6 +31,7 @@ interface NotificationProviderProps {
 
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({ children }) => {
     const { user } = useAuth();
+    const { toast } = useToast();
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -57,8 +59,24 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
             setNotifications(prev => [notification, ...prev]);
             setUnreadCount(prev => prev + 1);
 
-            // Show toast notification (you can use a toast library here)
-            console.log('New notification:', notification);
+            // Jouer le son
+            try {
+                // Utilisation d'un son doux et court (hébergé ou base64)
+                const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+                audio.volume = 0.5;
+                audio.play().catch(e => console.log('Audio play failed (user interaction needed likely):', e));
+            } catch (e) {
+                console.error('Audio error', e);
+            }
+
+            // Afficher le toast
+            toast({
+                title: notification.title || 'Nouvelle notification',
+                description: notification.message,
+                variant: 'default', // ou un style personnalisé
+            });
+
+            console.log('New notification received:', notification);
         });
 
         newSocket.on('disconnect', () => {
