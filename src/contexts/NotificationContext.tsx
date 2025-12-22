@@ -42,12 +42,14 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
         if (!user) return;
 
         // Get token from localStorage
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
         if (!token) return;
 
         const newSocket = io(config.wsUrl, {
+            path: '/ws',
             query: { token },
             transports: ['websocket'],
+            reconnectionAttempts: 5
         });
 
         newSocket.on('connect', () => {
