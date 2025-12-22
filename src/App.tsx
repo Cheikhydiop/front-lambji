@@ -17,7 +17,7 @@ import Events from "./pages/Events";
 import EventDetails from "./pages/EventDetails";
 import MyBets from "./pages/MyBets";
 import AvailableBets from "./pages/AvailableBets"; // NOUVELLE PAGE
-import WalletPage from "./pages/WalletPage";
+import WalletPage from "./pages/Wallet";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import { AppLayout } from "@/components/layout/AppLayout";

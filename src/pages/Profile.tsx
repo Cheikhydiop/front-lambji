@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Settings, LogOut, ChevronRight, Shield, Bell, HelpCircle, FileText, ArrowLeft, Check, Trash2 } from 'lucide-react';
+import { User, Settings, LogOut, ChevronRight, Shield, Bell, HelpCircle, FileText, ArrowLeft, Check, Trash2, Wallet } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,6 +14,7 @@ interface ProfileProps {
 }
 
 const menuItems = [
+  { icon: Wallet, label: 'Mon Portefeuille', path: '/wallet' },
   { icon: Bell, label: 'Notifications', path: '/notifications' },
   { icon: Shield, label: 'Sécurité', path: '/profile/security' },
   { icon: Settings, label: 'Paramètres', path: '/profile/settings' },
@@ -101,8 +102,8 @@ export default function Profile({ tab }: ProfileProps) {
                   <div
                     key={notification.id}
                     className={`p-4 rounded-xl border transition-all ${!notification.isRead
-                        ? 'bg-primary/5 border-primary/20 shadow-sm'
-                        : 'bg-card border-border/50'
+                      ? 'bg-primary/5 border-primary/20 shadow-sm'
+                      : 'bg-card border-border/50'
                       }`}
                   >
                     <div className="flex gap-4">

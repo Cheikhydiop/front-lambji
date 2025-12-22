@@ -22,7 +22,7 @@ export default function Wallet({ tab }: { tab?: string }) {
   const { toast } = useToast();
   const [action, setAction] = useState<ActionType>((tab as ActionType) || null);
   const [amount, setAmount] = useState('');
-  const [selectedProvider, setSelectedProvider] = useState('');
+  const [selectedProvider, setSelectedProvider] = useState('WAVE');
   const [phone, setPhone] = useState('');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
@@ -220,11 +220,12 @@ export default function Wallet({ tab }: { tab?: string }) {
                           : "border-zinc-700 bg-zinc-800 hover:border-zinc-500"
                       )}
                     >
-                      <div className="w-12 h-12 rounded-full bg-[#1dc0ed] flex items-center justify-center shadow-lg shadow-[#1dc0ed]/20 shrink-0">
-                        {/* Logo Wave Stylisé */}
-                        <svg className="w-7 h-7 text-white fill-current" viewBox="0 0 24 24">
-                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" />
-                        </svg>
+                      <div className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg shadow-[#1dc0ed]/20 shrink-0 overflow-hidden bg-white">
+                        <img
+                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCAqzvs4mXorfF039pQVGhdwwq-zx1mkcpzA&s"
+                          alt="Wave"
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <div className="text-left">
                         <span className="text-sm font-bold text-white tracking-wide block">Wave Mobile Money</span>
