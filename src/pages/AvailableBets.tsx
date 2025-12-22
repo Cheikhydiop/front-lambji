@@ -525,13 +525,13 @@ export default function AvailableBets() {
                           <div className="flex items-center gap-3">
                             <div className="relative">
                               <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold shadow-sm ring-2 ring-[#1a1b1e]">
-                                {bet.creator.name.charAt(0)}
+                                {(bet.creator?.name || '?').charAt(0).toUpperCase()}
                               </div>
                               {/* Indicateur en ligne optionnel */}
                               <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-[#1a1b1e] rounded-full"></div>
                             </div>
                             <div>
-                              <p className="font-bold text-gray-100 leading-tight">{bet.creator.name}</p>
+                              <p className="font-bold text-gray-100 leading-tight">{bet.creator?.name || 'Utilisateur Inconnu'}</p>
                               <div className="flex items-center gap-1.5 mt-0.5">
                                 <Clock className="w-3 h-3 text-gray-400" />
                                 <p className="text-xs text-gray-400 font-medium">
@@ -560,7 +560,7 @@ export default function AvailableBets() {
                           {/* Événement */}
                           <div className="flex justify-center mb-4">
                             <Badge className="bg-gradient-to-r from-orange-600 to-orange-700 text-white border-0 shadow-sm px-3 py-1 text-xs uppercase tracking-wide">
-                              {bet.fight.dayEvent.title}
+                              {bet.fight?.dayEvent?.title || 'Événement'}
                             </Badge>
                           </div>
 
@@ -575,11 +575,11 @@ export default function AvailableBets() {
                                 </div>
                               </div>
                               <h3 className="font-bold text-gray-100 text-sm md:text-base leading-tight">
-                                {bet.fight.fighterA.name}
+                                {bet.fight?.fighterA?.name || 'Combattant A'}
                               </h3>
                               {bet.fight.fighterA.nickname && (
                                 <p className="text-xs text-primary font-medium mt-0.5">
-                                  "{bet.fight.fighterA.nickname}"
+                                  "{bet.fight?.fighterA?.nickname}"
                                 </p>
                               )}
                             </div>
@@ -599,11 +599,11 @@ export default function AvailableBets() {
                                 </div>
                               </div>
                               <h3 className="font-bold text-gray-100 text-sm md:text-base leading-tight">
-                                {bet.fight.fighterB.name}
+                                {bet.fight?.fighterB?.name || 'Combattant B'}
                               </h3>
-                              {bet.fight.fighterB.nickname && (
+                              {bet.fight?.fighterB?.nickname && (
                                 <p className="text-xs text-primary font-medium mt-0.5">
-                                  "{bet.fight.fighterB.nickname}"
+                                  "{bet.fight?.fighterB?.nickname}"
                                 </p>
                               )}
                             </div>
@@ -613,7 +613,7 @@ export default function AvailableBets() {
                           <div className="flex items-center justify-center gap-2 mb-6">
                             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800/50 border border-white/5 rounded-full">
                               <MapPin className="w-3.5 h-3.5 text-zinc-400" />
-                              <span className="text-xs font-medium text-zinc-400">{bet.fight.location}</span>
+                              <span className="text-xs font-medium text-zinc-400">{bet.fight?.location || 'Lieu inconnu'}</span>
                             </div>
                           </div>
 
