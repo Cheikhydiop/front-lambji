@@ -1,112 +1,123 @@
-import { toast } from "@/hooks/use-toast";
+import { io, Socket } from 'socket.io-client';
+import { toast } from '@/hooks/use-toast';
 
+// Enum updated to match backend event names (snake_case)
+// This ensures compatibility with the socket.io events emitted by the backend
 export enum WebSocketMessageType {
-    CONNECTION_STATUS = 'CONNECTION_STATUS',
-    AUTH_ERROR = 'AUTH_ERROR',
-    FIGHT_STATUS_UPDATE = 'FIGHT_STATUS_UPDATE',
-    FIGHT_RESULT = 'FIGHT_RESULT',
-    FIGHT_STARTED = 'FIGHT_STARTED',
-    FIGHT_FINISHED = 'FIGHT_FINISHED',
-    FIGHT_CANCELLED = 'FIGHT_CANCELLED',
-    BET_CREATED = 'BET_CREATED',
-    BET_ACCEPTED = 'BET_ACCEPTED',
-    BET_CANCELLED = 'BET_CANCELLED',
-    BET_WON = 'BET_WON',
-    BET_LOST = 'BET_LOST',
-    TRANSACTION_CONFIRMED = 'TRANSACTION_CONFIRMED',
-    TRANSACTION_FAILED = 'TRANSACTION_FAILED',
-    WALLET_UPDATE = 'WALLET_UPDATE',
-    NOTIFICATION = 'NOTIFICATION',
-    SYSTEM_ALERT = 'SYSTEM_ALERT',
-    SUBSCRIBE_FIGHT = 'SUBSCRIBE_FIGHT',
-    UNSUBSCRIBE_FIGHT = 'UNSUBSCRIBE_FIGHT',
-    SUBSCRIBE_BETS = 'SUBSCRIBE_BETS',
-    UNSUBSCRIBE_BETS = 'UNSUBSCRIBE_BETS',
-    PING = 'PING',
-    PONG = 'PONG'
+    CONNECTION_STATUS = 'connection_status',
+    AUTH_ERROR = 'auth_error',
+    FIGHT_STATUS_UPDATE = 'fight_status_update',
+    FIGHT_RESULT = 'fight_result',
+    FIGHT_STARTED = 'fight_started',
+    FIGHT_FINISHED = 'fight_finished',
+    FIGHT_CANCELLED = 'fight_cancelled',
+    BET_CREATED = 'bet_created',
+    BET_ACCEPTED = 'bet_accepted',
+    BET_CANCELLED = 'bet_cancelled',
+    BET_WON = 'bet_won',
+    BET_LOST = 'bet_lost',
+    TRANSACTION_CONFIRMED = 'transaction_confirmed',
+    TRANSACTION_FAILED = 'transaction_failed',
+    WALLET_UPDATE = 'wallet_update',
+    NOTIFICATION = 'notification',
+    SYSTEM_ALERT = 'system_alert',
+    SUBSCRIBE_FIGHT = 'subscribe_fight',
+    UNSUBSCRIBE_FIGHT = 'unsubscribe_fight',
+    SUBSCRIBE_BETS = 'subscribe_bets',
+    UNSUBSCRIBE_BETS = 'unsubscribe_bets',
+    PING = 'ping',
+    PONG = 'pong'
 }
 
 type MessageHandler = (payload: any) => void;
 
 class WebSocketService {
-    private socket: WebSocket | null = null;
-    private handlers: Map<WebSocketMessageType, Set<MessageHandler>> = new Map();
-    private reconnectInterval: NodeJS.Timeout | null = null;
-    private isConnecting = false;
-    private url: string;
+    private socket: Socket | null = null;
+    private handlers: Map<string, Set<MessageHandler>> = new Map();
+    private baseUrl: string;
 
     constructor() {
-        this.url = (import.meta.env.VITE_WS_URL || 'https://jealous-giraffe-ndigueul-efe7a113.koyeb.app').replace('http', 'ws') + '/ws';
+        const envUrl = import.meta.env.VITE_WS_URL || 'https://jealous-giraffe-ndigueul-efe7a113.koyeb.app';
+        // Remove /ws suffix if present as it's added via path option
+        this.baseUrl = envUrl.replace(/\/ws\/?$/, '');
     }
 
-    public connect(userId: string) {
-        if (this.socket?.readyState === WebSocket.OPEN || this.isConnecting) return;
+    public connect(userId?: string) {
+        if (this.socket?.connected) return;
 
-        this.isConnecting = true;
-        console.log(`Connecting to WebSocket at ${this.url}...`);
+        const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+        if (!token) {
+            console.warn('[WebSocket] Cannot connect: No token found');
+            return;
+        }
 
-        this.socket = new WebSocket(this.url);
+        console.log('[WebSocket] Connecting to Socket.io at', this.baseUrl);
 
-        this.socket.onopen = () => {
-            console.log('WebSocket Connected');
-            this.isConnecting = false;
-            if (this.reconnectInterval) {
-                clearInterval(this.reconnectInterval);
-                this.reconnectInterval = null;
+        this.socket = io(this.baseUrl, {
+            path: '/ws', // Matches backend configuration
+            query: { token }, // Backend expects token in query
+            transports: ['websocket'],
+            reconnection: true,
+            reconnectionAttempts: 10,
+            reconnectionDelay: 1000,
+            withCredentials: true
+        });
+
+        this.socket.on('connect', () => {
+            console.log('[WebSocket] Connected', this.socket?.id);
+
+            // Log connection status
+            this.handleMessage(WebSocketMessageType.CONNECTION_STATUS, {
+                status: 'connected',
+                userId: userId,
+                socketId: this.socket?.id
+            });
+        });
+
+        this.socket.on('connect_error', (err) => {
+            console.error('[WebSocket] Connection Error', err.message);
+        });
+
+        this.socket.on('disconnect', (reason) => {
+            console.log('[WebSocket] Disconnected:', reason);
+        });
+
+        // Listen to ALL events and dispatch to handlers
+        this.socket.onAny((eventName, ...args) => {
+            const data = args[0];
+            // console.debug(`[WebSocket] Event received: ${eventName}`, data);
+
+            this.handleMessage(eventName, data);
+
+            // Global handling for notifications
+            if (eventName === WebSocketMessageType.NOTIFICATION) {
+                toast({
+                    title: data.title || 'Notification',
+                    description: data.message || data.description,
+                });
+            } else if (eventName === WebSocketMessageType.SYSTEM_ALERT) {
+                toast({
+                    title: data.title || 'Alerte Système',
+                    description: data.message,
+                    variant: 'destructive'
+                });
             }
-
-            // Auto-subscribe to personal updates
-            this.sendMessage(WebSocketMessageType.SUBSCRIBE_BETS, { userId });
-        };
-
-        this.socket.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                const { type, payload, message } = data; // backend sometimes sends 'message' instead of payload in connection status
-
-                this.handleMessage(type, payload || message || data);
-
-                // Global notification handling
-                if (type === WebSocketMessageType.NOTIFICATION || type === WebSocketMessageType.SYSTEM_ALERT) {
-                    toast({
-                        title: payload.title || 'Notification',
-                        description: payload.message || payload.description,
-                    });
-                }
-            } catch (e) {
-                console.error('Error parsing WS message', e);
-            }
-        };
-
-        this.socket.onclose = () => {
-            console.log('WebSocket Disconnected');
-            this.isConnecting = false;
-            this.socket = null;
-            this.startReconnect(userId);
-        };
-
-        this.socket.onerror = (error) => {
-            console.error('WebSocket Error', error);
-            this.isConnecting = false;
-        };
+        });
     }
 
     public disconnect() {
         if (this.socket) {
-            this.socket.close();
+            this.socket.disconnect();
             this.socket = null;
-        }
-        if (this.reconnectInterval) {
-            clearInterval(this.reconnectInterval);
-            this.reconnectInterval = null;
         }
     }
 
     public sendMessage(type: WebSocketMessageType, payload: any = {}) {
-        if (this.socket?.readyState === WebSocket.OPEN) {
-            this.socket.send(JSON.stringify({ type, payload }));
+        if (this.socket?.connected) {
+            this.socket.emit(type, payload);
         } else {
-            console.warn('Cannot send message: WebSocket is not open');
+            // Queue message or warn?
+            // console.warn('[WebSocket] Cannot send message: not connected');
         }
     }
 
@@ -121,18 +132,10 @@ class WebSocketService {
         this.handlers.get(type)?.delete(handler);
     }
 
-    private handleMessage(type: WebSocketMessageType, payload: any) {
+    private handleMessage(type: string, payload: any) {
         const typeHandlers = this.handlers.get(type);
         if (typeHandlers) {
             typeHandlers.forEach(handler => handler(payload));
-        }
-    }
-
-    private startReconnect(userId: string) {
-        if (!this.reconnectInterval) {
-            this.reconnectInterval = setInterval(() => {
-                this.connect(userId);
-            }, 5000);
         }
     }
 }
