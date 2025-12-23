@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Ticket, TrendingUp, TrendingDown, Clock, Plus, Filter, RefreshCw, User, Trophy, Calendar, Swords, ChevronRight } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { BetCard } from '@/components/bets/BetCard';
-import { CancelBetButton } from '@/components/bets/CancelBetButton';
+import { CancelBetButtonNew } from '@/components/bets/CancelBetButtonNew';
 import { PageLoader } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -599,11 +599,12 @@ export default function MyBets() {
                         )}
 
                         {/* Bouton d'annulation pour les paris PENDING créés par l'utilisateur */}
-                        {bet.status === 'PENDING' && isUserCreator && bet.canCancelUntil && (
+                        {bet.status === 'PENDING' && isUserCreator && (
                           <div className="border-t pt-3 mt-3">
-                            <CancelBetButton
+                            <CancelBetButtonNew
                               betId={bet.id}
-                              canCancelUntil={bet.canCancelUntil}
+                              createdAt={bet.createdAt}
+                              status={bet.status}
                               onCancel={() => loadData()}
                             />
                           </div>
