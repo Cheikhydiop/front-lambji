@@ -71,6 +71,18 @@ class FighterService extends BaseService {
   async getFighterStats(fighterId: string): Promise<ApiResponse<FighterStats[]>> {
     return this.get<FighterStats[]>(`/${fighterId}/stats`);
   }
+
+  async createFighter(payload: Partial<Fighter>): Promise<ApiResponse<Fighter>> {
+    return this.post<Fighter>('/', payload);
+  }
+
+  async updateFighter(fighterId: string, payload: Partial<Fighter>): Promise<ApiResponse<Fighter>> {
+    return this.patch<Fighter>(`/${fighterId}`, payload);
+  }
+
+  async deleteFighter(fighterId: string): Promise<ApiResponse<void>> {
+    return this.delete(`/${fighterId}`);
+  }
 }
 
 export const fighterService = new FighterService();

@@ -87,7 +87,8 @@ export default function AdminFighters() {
   const handleSubmit = async () => {
     try {
       if (editingFighter) {
-        await adminService.updateFighter(editingFighter.id, {
+        // Utiliser fighterService directement au lieu de adminService
+        await fighterService.updateFighter(editingFighter.id, {
           name: formData.name,
           nickname: formData.nickname,
           stable: formData.stable,
@@ -96,7 +97,7 @@ export default function AdminFighters() {
         });
         toast({ title: 'Combattant mis à jour' });
       } else {
-        await adminService.createFighter({
+        await fighterService.createFighter({
           name: formData.name,
           nickname: formData.nickname,
           stable: formData.stable,
@@ -115,7 +116,7 @@ export default function AdminFighters() {
 
   const handleDelete = async (fighterId: string) => {
     try {
-      await adminService.deleteFighter(fighterId);
+      await fighterService.deleteFighter(fighterId);
       toast({ title: 'Combattant supprimé' });
       loadFighters();
     } catch {
