@@ -426,6 +426,7 @@ export default function Fights() {
                   showLocation={true}
                   showEvent={fight.dayEvent ? true : false}
                   eventName={fight.dayEvent?.title}
+                  result={fight.result}
                 />
 
                 {/* Informations supplémentaires */}

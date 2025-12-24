@@ -30,6 +30,10 @@ interface FightCardProps {
   showLocation?: boolean;
   showEvent?: boolean;
   eventName?: string;
+  result?: {
+    winner: 'A' | 'B' | 'DRAW';
+    victoryMethod?: string;
+  };
   onClick?: (e: React.MouseEvent) => void;
 }
 
@@ -49,10 +53,13 @@ export function FightCard({
   showLocation = false,
   showEvent = false,
   eventName,
+  result,
   onClick,
 }: FightCardProps) {
   const isLive = status === 'ONGOING';
   const isScheduled = status === 'SCHEDULED';
+  const isFinished = status === 'FINISHED';
+  const hasWinner = result && result.winner !== 'DRAW';
 
 
   return (
@@ -100,36 +107,77 @@ export function FightCard({
       {/* Fighters */}
       <div className="flex items-center justify-between gap-4">
         {/* Fighter A */}
-        <div className="flex-1 text-center">
-          <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-primary/30">
+        <div className={cn(
+          "flex-1 text-center relative",
+          isFinished && result?.winner === 'A' && "scale-105"
+        )}>
+          {/* Badge Vainqueur */}
+          {isFinished && result?.winner === 'A' && (
+            <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-10">
+              <div className="flex items-center gap-1 px-3 py-1 bg-yellow-500 text-white text-xs font-bold rounded-full shadow-lg">
+                <Trophy className="w-3 h-3" />
+                VAINQUEUR
+              </div>
+            </div>
+          )}
+          <div className={cn(
+            "w-16 h-16 mx-auto mb-2 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2",
+            isFinished && result?.winner === 'A' ? "border-yellow-500 ring-4 ring-yellow-500/20" : "border-primary/30",
+            isFinished && result?.winner !== 'A' && result?.winner !== 'DRAW' && "opacity-50"
+          )}>
             {fighterA.profileImage ? (
               <img src={fighterA.profileImage} alt={fighterA.name} className="w-full h-full object-cover" />
             ) : (
               <Trophy className="w-6 h-6 text-primary" />
             )}
           </div>
-          <h3 className="font-semibold text-sm text-foreground truncate">{fighterA.name}</h3>
+          <h3 className={cn(
+            "font-semibold text-sm truncate",
+            isFinished && result?.winner === 'A' ? "text-yellow-600 font-bold" : "text-foreground",
+            isFinished && result?.winner !== 'A' && result?.winner !== 'DRAW' && "text-muted-foreground"
+          )}>{fighterA.name}</h3>
           <p className="text-xs text-muted-foreground">{fighterA.wins}V - {fighterA.losses}D</p>
-          {/* Odds removed */}
         </div>
 
         {/* VS */}
         <div className="flex flex-col items-center">
           <span className="text-lg font-bold text-muted-foreground">VS</span>
+          {isFinished && result?.winner === 'DRAW' && (
+            <span className="text-xs text-muted-foreground mt-1">Nul</span>
+          )}
         </div>
 
         {/* Fighter B */}
-        <div className="flex-1 text-center">
-          <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-secondary/30">
+        <div className={cn(
+          "flex-1 text-center relative",
+          isFinished && result?.winner === 'B' && "scale-105"
+        )}>
+          {/* Badge Vainqueur */}
+          {isFinished && result?.winner === 'B' && (
+            <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-10">
+              <div className="flex items-center gap-1 px-3 py-1 bg-yellow-500 text-white text-xs font-bold rounded-full shadow-lg">
+                <Trophy className="w-3 h-3" />
+                VAINQUEUR
+              </div>
+            </div>
+          )}
+          <div className={cn(
+            "w-16 h-16 mx-auto mb-2 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2",
+            isFinished && result?.winner === 'B' ? "border-yellow-500 ring-4 ring-yellow-500/20" : "border-secondary/30",
+            isFinished && result?.winner !== 'B' && result?.winner !== 'DRAW' && "opacity-50"
+          )}>
             {fighterB.profileImage ? (
               <img src={fighterB.profileImage} alt={fighterB.name} className="w-full h-full object-cover" />
             ) : (
               <Trophy className="w-6 h-6 text-secondary" />
             )}
           </div>
-          <h3 className="font-semibold text-sm text-foreground truncate">{fighterB.name}</h3>
+          <h3 className={cn(
+            "font-semibold text-sm truncate",
+            isFinished && result?.winner === 'B' ? "text-yellow-600 font-bold" : "text-foreground",
+            isFinished && result?.winner !== 'B' && result?.winner !== 'DRAW' && "text-muted-foreground"
+          )}>{fighterB.name}</h3>
           <p className="text-xs text-muted-foreground">{fighterB.wins}V - {fighterB.losses}D</p>
-          {/* Odds removed */}
         </div>
       </div>
 
