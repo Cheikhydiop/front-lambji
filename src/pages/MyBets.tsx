@@ -523,20 +523,6 @@ export default function MyBets() {
                                   {bet.fight.dayEvent.title}
                                 </p>
                               )}
-                              {/* Affichage du vainqueur si combat terminé */}
-                              {bet.fight?.status === 'FINISHED' && bet.fight?.result && (
-                                <div className="flex items-center gap-1.5 mt-1">
-                                  <Trophy className="w-3.5 h-3.5 text-yellow-500" />
-                                  <span className="text-xs font-semibold text-yellow-500">
-                                    {bet.fight.result.winner === 'A' && `${bet.fight.fighterA?.name} a gagné`}
-                                    {bet.fight.result.winner === 'B' && `${bet.fight.fighterB?.name} a gagné`}
-                                    {bet.fight.result.winner === 'DRAW' && 'Match nul'}
-                                  </span>
-                                  {bet.fight.result.victoryMethod && (
-                                    <span className="text-xs text-gray-500">({bet.fight.result.victoryMethod})</span>
-                                  )}
-                                </div>
-                              )}
                             </div>
                           </div>
                           <div className="flex items-center gap-4 text-sm">
@@ -558,11 +544,11 @@ export default function MyBets() {
                         <div className="grid grid-cols-2 gap-3 mb-4">
                           {/* Colonne Créateur */}
                           <div className={`rounded-xl p-3 border-2 flex flex-col items-center transition-all duration-300 ${(bet.fight?.status === 'FINISHED' && bet.fight?.result && (
-                              (bet.chosenFighter === 'A' && bet.fight.result.winner === 'A') ||
-                              (bet.chosenFighter === 'B' && bet.fight.result.winner === 'B')
-                            ))
-                              ? 'border-yellow-500 bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 shadow-lg shadow-yellow-500/50'
-                              : isUserCreator ? 'bg-primary/10 border-primary/20' : 'bg-zinc-800/50 border-zinc-700'
+                            (bet.chosenFighter === 'A' && bet.fight.result.winner === 'A') ||
+                            (bet.chosenFighter === 'B' && bet.fight.result.winner === 'B')
+                          ))
+                            ? 'border-yellow-500 bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 shadow-lg shadow-yellow-500/50'
+                            : isUserCreator ? 'bg-primary/10 border-primary/20' : 'bg-zinc-800/50 border-zinc-700'
                             }`}>
                             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1 text-center truncate w-full">
                               Créateur
@@ -586,11 +572,11 @@ export default function MyBets() {
 
                           {/* Colonne Accepteur */}
                           <div className={`rounded-xl p-3 border-2 flex flex-col items-center transition-all duration-300 ${(bet.fight?.status === 'FINISHED' && bet.fight?.result && (
-                              (bet.chosenFighter === 'A' && bet.fight.result.winner === 'B') ||
-                              (bet.chosenFighter === 'B' && bet.fight.result.winner === 'A')
-                            ))
-                              ? 'border-yellow-500 bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 shadow-lg shadow-yellow-500/50'
-                              : !isUserCreator ? 'bg-primary/10 border-primary/20' : 'bg-zinc-800/50 border-zinc-700'
+                            (bet.chosenFighter === 'A' && bet.fight.result.winner === 'B') ||
+                            (bet.chosenFighter === 'B' && bet.fight.result.winner === 'A')
+                          ))
+                            ? 'border-yellow-500 bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 shadow-lg shadow-yellow-500/50'
+                            : !isUserCreator ? 'bg-primary/10 border-primary/20' : 'bg-zinc-800/50 border-zinc-700'
                             }`}>
                             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1 text-center truncate w-full">
                               Accepteur
