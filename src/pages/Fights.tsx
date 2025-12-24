@@ -37,13 +37,19 @@ export default function Fights() {
     try {
       // Charger les combats
       const fightsResponse = await fightService.getFights();
-      if (fightsResponse.data) {
+      console.log('[Fights] API Response:', fightsResponse);
+
+      if (fightsResponse.data && fightsResponse.data.length > 0) {
         // Mapper _count.bets vers totalBets pour chaque combat
         const fightsWithBetCount = fightsResponse.data.map((fight: any) => ({
           ...fight,
           totalBets: fight._count?.bets || 0
         }));
+        console.log('[Fights] Loaded fights from API:', fightsWithBetCount.length);
         setFights(fightsWithBetCount);
+      } else {
+        console.log('[Fights] No data from API, using mock');
+        setFights(mockFights as unknown as Fight[]);
       }
 
       // Charger les événements
@@ -52,7 +58,7 @@ export default function Fights() {
         setEvents(eventsResponse.data);
       }
     } catch (error) {
-      console.error('Erreur API, utilisation des données de secours:', error);
+      console.error('[Fights] Error loading data:', error);
       // Fallback sur les données mock en cas d'erreur
       setFights(mockFights as unknown as Fight[]);
       setEvents(mockEvents as unknown as DayEvent[]);

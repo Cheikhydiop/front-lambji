@@ -72,12 +72,15 @@ export default function AdminFighters() {
   const loadFighters = async () => {
     try {
       const response = await fighterService.getFighters();
-      if (response.data) {
+      console.log('[Admin Fighters] Response:', response);
+      if (response.data && response.data.length > 0) {
         setFighters(response.data);
       } else {
+        console.log('[Admin Fighters] No data from API, using mock');
         setFighters(mockFighters);
       }
-    } catch {
+    } catch (error) {
+      console.error('[Admin Fighters] Error loading fighters:', error);
       setFighters(mockFighters);
     } finally {
       setLoading(false);
