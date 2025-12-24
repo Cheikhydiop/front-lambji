@@ -16,6 +16,7 @@ export enum WebSocketMessageType {
     BET_CANCELLED = 'bet_cancelled',
     BET_WON = 'bet_won',
     BET_LOST = 'bet_lost',
+    BET_REFUNDED = 'bet_refunded',
     TRANSACTION_CONFIRMED = 'transaction_confirmed',
     TRANSACTION_FAILED = 'transaction_failed',
     WALLET_UPDATE = 'wallet_update',
@@ -120,6 +121,29 @@ class WebSocketService {
                     description: `Le pari sur ${data.fight?.title || 'le combat'} a été accepté.`,
                     duration: 6000,
                     className: "bg-green-50 border-green-200"
+                });
+            } else if (eventName === WebSocketMessageType.BET_WON) {
+                this.playNotificationSound();
+                toast({
+                    title: data.title || 'Félicitations !',
+                    description: data.message || 'Vous avez gagné un pari !',
+                    duration: 10000, // Durée plus longue pour les victoires
+                    className: "bg-yellow-50 border-yellow-200 border-2" // Style festif
+                });
+            } else if (eventName === WebSocketMessageType.BET_LOST) {
+                // Pas de son festif pour la perte, peut-être pas de son du tout
+                toast({
+                    title: data.title || 'Pari Terminé',
+                    description: data.message || 'Votre pari est perdant.',
+                    duration: 8000
+                });
+            } else if (eventName === 'bet_refunded') {
+                this.playNotificationSound();
+                toast({
+                    title: data.title || 'Pari Remboursé',
+                    description: data.message || 'Votre pari a été remboursé.',
+                    duration: 8000,
+                    className: "bg-blue-50 border-blue-200"
                 });
             }
         });
