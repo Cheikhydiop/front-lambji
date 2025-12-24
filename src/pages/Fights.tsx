@@ -5,6 +5,7 @@ import { FightCard } from '@/components/fights/FightCard';
 import { PageLoader } from '@/components/common/LoadingSpinner';
 import { Input } from '@/components/ui/input';
 import { fightService, Fight, DayEvent } from '@/services';
+import { webSocketService, WebSocketMessageType } from '@/services/WebSocketService';
 
 // Types étendus
 type FilterStatus = 'all' | 'SCHEDULED' | 'ONGOING' | 'FINISHED';
@@ -120,6 +121,22 @@ export default function Fights() {
 
     return () => clearInterval(interval);
   }, [stats.liveFights]);
+
+  // Écoute WebSocket pour les résultats de combat validés
+  useEffect(() => {
+    const handleFightResult = (payload: any) => {
+      console.log('[Fights] Résultat de combat reçu:', payload);
+      // Recharger tous les combats pour mettre à jour le statut
+      loadData();
+    };
+
+    // S'abonner à l'événement de résultat de combat
+    webSocketService.on(WebSocketMessageType.FIGHT_RESULT, handleFightResult);
+
+    return () => {
+      webSocketService.off(WebSocketMessageType.FIGHT_RESULT, handleFightResult);
+    };
+  }, [loadData]);
 
   // Données mock pour le fallback
   const mockFights = [

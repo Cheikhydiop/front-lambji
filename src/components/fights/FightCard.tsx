@@ -31,7 +31,7 @@ interface FightCardProps {
   showEvent?: boolean;
   eventName?: string;
   result?: {
-    winner: 'A' | 'B' | 'DRAW';
+    winner: 'A' | 'B' | 'DRAW' | 'CANCELLED';
     victoryMethod?: string;
   };
   onClick?: (e: React.MouseEvent) => void;
