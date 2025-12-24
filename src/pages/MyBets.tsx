@@ -485,12 +485,26 @@ export default function MyBets() {
                             <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center border border-zinc-700 text-gray-400">
                               <Swords className="w-5 h-5" />
                             </div>
-                            <div>
+                            <div className="flex-1">
                               <h3 className="font-bold text-gray-100 text-lg leading-tight">{bet.fight?.title || 'Combat inconnu'}</h3>
                               {bet.fight?.dayEvent && (
                                 <p className="text-xs text-primary font-medium mt-0.5">
                                   {bet.fight.dayEvent.title}
                                 </p>
+                              )}
+                              {/* Affichage du vainqueur si combat terminé */}
+                              {bet.fight?.status === 'FINISHED' && bet.fight?.result && (
+                                <div className="flex items-center gap-1.5 mt-1">
+                                  <Trophy className="w-3.5 h-3.5 text-yellow-500" />
+                                  <span className="text-xs font-semibold text-yellow-500">
+                                    {bet.fight.result.winner === 'A' && `${bet.fight.fighterA?.name} a gagné`}
+                                    {bet.fight.result.winner === 'B' && `${bet.fight.fighterB?.name} a gagné`}
+                                    {bet.fight.result.winner === 'DRAW' && 'Match nul'}
+                                  </span>
+                                  {bet.fight.result.victoryMethod && (
+                                    <span className="text-xs text-gray-500">({bet.fight.result.victoryMethod})</span>
+                                  )}
+                                </div>
                               )}
                             </div>
                           </div>
