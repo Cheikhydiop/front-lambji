@@ -132,8 +132,13 @@ export default function AdminFights() {
       setDialogOpen(false);
       resetForm();
       loadData();
-    } catch {
-      toast({ title: 'Erreur', variant: 'destructive' });
+    } catch (error: any) {
+      console.error(error);
+      toast({
+        title: 'Erreur',
+        description: error.response?.data?.message || 'Erreur lors de la création',
+        variant: 'destructive'
+      });
     }
   };
 
