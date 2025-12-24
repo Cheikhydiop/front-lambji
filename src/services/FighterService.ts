@@ -42,7 +42,7 @@ export interface FighterStats {
 
 class FighterService extends BaseService {
   constructor() {
-    super('/fighter');
+    super('/fighters');
   }
 
   async getFighters(params?: FighterFilters): Promise<ApiResponse<Fighter[]>> {
@@ -51,7 +51,7 @@ class FighterService extends BaseService {
     if (params?.stable) searchParams.set('stable', params.stable);
     if (params?.limit) searchParams.set('limit', params.limit.toString());
     if (params?.offset) searchParams.set('offset', params.offset.toString());
-    
+
     const query = searchParams.toString() ? `?${searchParams.toString()}` : '';
     return this.get<Fighter[]>(query);
   }
