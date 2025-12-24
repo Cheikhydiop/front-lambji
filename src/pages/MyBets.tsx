@@ -557,7 +557,12 @@ export default function MyBets() {
                         {/* Détails du duel (Grid: Créateur vs Accepteur) */}
                         <div className="grid grid-cols-2 gap-3 mb-4">
                           {/* Colonne Créateur */}
-                          <div className={`rounded-xl p-3 border flex flex-col items-center ${isUserCreator ? 'bg-primary/10 border-primary/20' : 'bg-zinc-800/50 border-zinc-700'
+                          <div className={`rounded-xl p-3 border-2 flex flex-col items-center transition-all duration-300 ${(bet.fight?.status === 'FINISHED' && bet.fight?.result && (
+                              (bet.chosenFighter === 'A' && bet.fight.result.winner === 'A') ||
+                              (bet.chosenFighter === 'B' && bet.fight.result.winner === 'B')
+                            ))
+                              ? 'border-yellow-500 bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 shadow-lg shadow-yellow-500/50'
+                              : isUserCreator ? 'bg-primary/10 border-primary/20' : 'bg-zinc-800/50 border-zinc-700'
                             }`}>
                             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1 text-center truncate w-full">
                               Créateur
@@ -565,6 +570,14 @@ export default function MyBets() {
                             <p className="text-xs font-bold mb-2 truncate w-full text-center">
                               {bet.creator?.name || 'Inconnu'} {isUserCreator && '(Moi)'}
                             </p>
+                            {(bet.fight?.status === 'FINISHED' && bet.fight?.result && (
+                              (bet.chosenFighter === 'A' && bet.fight.result.winner === 'A') ||
+                              (bet.chosenFighter === 'B' && bet.fight.result.winner === 'B')
+                            )) && (
+                                <span className="text-[10px] font-bold text-yellow-500 bg-yellow-500/20 px-2 py-0.5 rounded-full mb-2">
+                                  ✨ Gagnant
+                                </span>
+                              )}
                             <Badge className={`text-sm px-3 py-1 shadow-sm w-full justify-center ${bet.chosenFighter === 'A' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-red-600 hover:bg-red-700'
                               } border-0`}>
                               {bet.chosenFighter === 'A' ? bet.fight?.fighterA?.name : bet.fight?.fighterB?.name}
@@ -572,7 +585,12 @@ export default function MyBets() {
                           </div>
 
                           {/* Colonne Accepteur */}
-                          <div className={`rounded-xl p-3 border flex flex-col items-center ${!isUserCreator ? 'bg-primary/10 border-primary/20' : 'bg-zinc-800/50 border-zinc-700'
+                          <div className={`rounded-xl p-3 border-2 flex flex-col items-center transition-all duration-300 ${(bet.fight?.status === 'FINISHED' && bet.fight?.result && (
+                              (bet.chosenFighter === 'A' && bet.fight.result.winner === 'B') ||
+                              (bet.chosenFighter === 'B' && bet.fight.result.winner === 'A')
+                            ))
+                              ? 'border-yellow-500 bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 shadow-lg shadow-yellow-500/50'
+                              : !isUserCreator ? 'bg-primary/10 border-primary/20' : 'bg-zinc-800/50 border-zinc-700'
                             }`}>
                             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1 text-center truncate w-full">
                               Accepteur
@@ -580,6 +598,14 @@ export default function MyBets() {
                             <p className="text-xs font-bold mb-2 truncate w-full text-center">
                               {bet.acceptor?.name || '(En attente)'} {!isUserCreator && '(Moi)'}
                             </p>
+                            {(bet.fight?.status === 'FINISHED' && bet.fight?.result && (
+                              (bet.chosenFighter === 'A' && bet.fight.result.winner === 'B') ||
+                              (bet.chosenFighter === 'B' && bet.fight.result.winner === 'A')
+                            )) && (
+                                <span className="text-[10px] font-bold text-yellow-500 bg-yellow-500/20 px-2 py-0.5 rounded-full mb-2">
+                                  ✨ Gagnant
+                                </span>
+                              )}
                             <Badge variant="outline" className={`text-sm px-3 py-1 shadow-sm w-full justify-center bg-background ${bet.chosenFighter === 'A' ? 'border-red-500 text-red-600' : 'border-blue-500 text-blue-600'
                               }`}>
                               {/* L'accepteur a forcément l'autre lutteur */}
