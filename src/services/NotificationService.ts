@@ -52,7 +52,7 @@ class NotificationService extends BaseService {
     if (filters?.type) params.append('type', filters.type);
     if (filters?.limit) params.append('limit', filters.limit.toString());
     if (filters?.offset) params.append('offset', filters.offset.toString());
-    
+
     const queryString = params.toString();
     return this.get<Notification[]>(`/${queryString ? `?${queryString}` : ''}`);
   }
@@ -69,7 +69,7 @@ class NotificationService extends BaseService {
 
   // Mark all as read
   markAllAsRead(): Promise<ApiResponse<{ updated: number }>> {
-    return this.post('/mark-all-read');
+    return this.patch('/read-all', {});  // Correction: utilise PATCH /read-all au lieu de POST /mark-all-read
   }
 
   // Delete notification
