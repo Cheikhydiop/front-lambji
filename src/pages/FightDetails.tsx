@@ -733,6 +733,48 @@ export default function FightDetails() {
           </Card>
         )}
 
+        {/* Message si les paris sont fermés */}
+        {fight.status !== 'SCHEDULED' && (
+          <Card className="border-amber-200 bg-amber-50/50">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-6 h-6 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <h3 className="font-bold text-amber-900 mb-2">Paris fermés</h3>
+                  <p className="text-sm text-amber-800 leading-relaxed">
+                    {fight.status === 'ONGOING' && (
+                      <>
+                        Ce combat est <strong>en cours</strong>. Les paris ne sont plus acceptés. Consultez les résultats une fois le combat terminé.
+                      </>
+                    )}
+                    {fight.status === 'FINISHED' && (
+                      <>
+                        Ce combat est <strong>terminé</strong>. Les paris ne sont plus acceptés. {fight.result && 'Consultez le résultat ci-dessous.'}
+                      </>
+                    )}
+                    {fight.status === 'CANCELLED' && (
+                      <>
+                        Ce combat a été <strong>annulé</strong>. Les paris ont été remboursés.
+                      </>
+                    )}
+                    {fight.status === 'POSTPONED' && (
+                      <>
+                        Ce combat a été <strong>reporté</strong>. Les paris seront à nouveau disponibles une fois la nouvelle date confirmée.
+                      </>
+                    )}
+                  </p>
+                  <div className="mt-3 p-3 bg-white rounded-lg border border-amber-200">
+                    <p className="text-xs text-amber-700">
+                      <strong>ℹ️ Règle importante :</strong> Les paris ne sont autorisés que sur les combats programmés (statut "À VENIR"). Dès qu'un combat démarre, les paris sont automatiquement fermés pour garantir l'équité.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+
         {/* Paris disponibles */}
         {availableBets.length > 0 && (
           <div className="space-y-4">

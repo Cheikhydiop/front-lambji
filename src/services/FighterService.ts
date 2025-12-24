@@ -42,18 +42,39 @@ export interface FighterStats {
 
 class FighterService extends BaseService {
   constructor() {
-    super('/fighters');
+    super('/fighter');  // Correction: le backend utilise /api/fighter (singulier)
   }
 
   async getFighters(params?: FighterFilters): Promise<ApiResponse<Fighter[]>> {
     const searchParams = new URLSearchParams();
+
+    // Le backend nécessite ces paramètres avec des valeurs par défaut
+    searchParams.set('limit', (params?.limit || 100).toString());
+    searchParams.set('offset', (params?.offset || 0).toString());
+
+    // Paramètres optionnels
     if (params?.status) searchParams.set('status', params.status);
     if (params?.stable) searchParams.set('stable', params.stable);
-    if (params?.limit) searchParams.set('limit', params.limit.toString());
-    if (params?.offset) searchParams.set('offset', params.offset.toString());
 
-    const query = searchParams.toString() ? `?${searchParams.toString()}` : '';
-    return this.get<Fighter[]>(query);
+    const query = `?${searchParams.toString()}`;
+
+    try {
+      // Tenter d'utiliser la route principale
+      const response = await this.get<Fighter[]>(query);
+
+      // Si la réponse est valide et contient des données, la retourner
+      if (response.data && Array.isArray(response.data)) {
+        return response;
+      }
+
+      // Sinon, utiliser la route /top comme fallback (bug du backend avec validation)
+      console.warn('[FighterService] Route principale échouée, utilisation de /top comme fallback');
+      return this.getTopFighters();
+    } catch (error) {
+      // En cas d'erreur, utiliser la route /top
+      console.warn('[FighterService] Erreur sur route principale, utilisation de /top');
+      return this.getTopFighters();
+    }
   }
 
   async getFighter(fighterId: string): Promise<ApiResponse<Fighter>> {
