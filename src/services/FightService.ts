@@ -115,6 +115,32 @@ class FightService extends BaseService {
     return this.get<DayEvent>('/day-events/current');
   }
 
+  // Fight Management (Admin)
+  async createFight(data: any): Promise<ApiResponse<Fight>> {
+    return this.post<Fight>('/', data);
+  }
+
+  async updateFightStatus(fightId: string, status: string): Promise<ApiResponse<Fight>> {
+    return this.patch<Fight>(`/${fightId}/status`, { status });
+  }
+
+  // Day Events Management (Admin)
+  async createDayEvent(data: any): Promise<ApiResponse<DayEvent>> {
+    return this.post<DayEvent>('/day-events', data);
+  }
+
+  async updateDayEvent(eventId: string, data: any): Promise<ApiResponse<DayEvent>> {
+    return this.put<DayEvent>(`/day-events/${eventId}`, data);
+  }
+
+  async deleteDayEvent(eventId: string): Promise<ApiResponse<any>> {
+    return this.delete<any>(`/day-events/${eventId}`);
+  }
+
+  async expirePastFights(): Promise<ApiResponse<any>> {
+    return this.post<any>('/expire-past', {});
+  }
+
   async validateFightResult(fightId: string, payload: ValidateResultPayload): Promise<ApiResponse<Fight>> {
     return this.post<Fight>(`/${fightId}/validate-result`, payload);
   }

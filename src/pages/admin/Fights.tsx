@@ -27,7 +27,6 @@ import {
 import { Label } from '@/components/ui/label';
 import { fightService, Fight } from '@/services/FightService';
 import { fighterService, Fighter } from '@/services/FighterService';
-import { adminService } from '@/services/AdminService';
 import { webSocketService, WebSocketMessageType } from '@/services/WebSocketService';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { useToast } from '@/hooks/use-toast';
@@ -120,7 +119,7 @@ export default function AdminFights() {
 
   const handleCreateFight = async () => {
     try {
-      await adminService.createFight({
+      await fightService.createFight({
         title: formData.title,
         location: formData.location,
         scheduledAt: formData.scheduledAt,
@@ -140,7 +139,7 @@ export default function AdminFights() {
 
   const handleUpdateStatus = async (fightId: string, status: string) => {
     try {
-      await adminService.updateFightStatus(fightId, status);
+      await fightService.updateFightStatus(fightId, status);
       toast({ title: 'Statut mis à jour' });
       loadData();
     } catch {
