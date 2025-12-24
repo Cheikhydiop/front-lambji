@@ -38,7 +38,12 @@ export default function Fights() {
       // Charger les combats
       const fightsResponse = await fightService.getFights();
       if (fightsResponse.data) {
-        setFights(fightsResponse.data);
+        // Mapper _count.bets vers totalBets pour chaque combat
+        const fightsWithBetCount = fightsResponse.data.map((fight: any) => ({
+          ...fight,
+          totalBets: fight._count?.bets || 0
+        }));
+        setFights(fightsWithBetCount);
       }
 
       // Charger les événements
