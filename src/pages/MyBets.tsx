@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { betService } from '@/services';
 import type { Bet } from '@/services/BetService';
+import { webSocketService, WebSocketMessageType } from '@/services/WebSocketService';
 
 type TabType = 'active' | 'history';
 type FilterStatus = 'all' | 'PENDING' | 'ACCEPTED' | 'WON' | 'LOST' | 'CANCELLED' | 'REFUNDED';
@@ -218,6 +219,36 @@ export default function MyBets() {
       return () => clearInterval(interval);
     }
   }, [calculatedStats.activeBets]);
+
+  // Écoute WebSocket pour les mises à jour en temps réel
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const handleBetUpdate = (payload: any) => {
+      console.log('[MyBets] Mise à jour de pari reçue:', payload);
+      loadData();
+    };
+
+    const handleFightResult = (payload: any) => {
+      console.log('[MyBets] Résultat de combat reçu:', payload);
+      loadData();
+    };
+
+    // S'abonner aux événements
+    webSocketService.on(WebSocketMessageType.BET_WON, handleBetUpdate);
+    webSocketService.on(WebSocketMessageType.BET_LOST, handleBetUpdate);
+    webSocketService.on(WebSocketMessageType.BET_ACCEPTED, handleBetUpdate);
+    webSocketService.on(WebSocketMessageType.BET_CANCELLED, handleBetUpdate);
+    webSocketService.on(WebSocketMessageType.FIGHT_RESULT, handleFightResult);
+
+    return () => {
+      webSocketService.off(WebSocketMessageType.BET_WON, handleBetUpdate);
+      webSocketService.off(WebSocketMessageType.BET_LOST, handleBetUpdate);
+      webSocketService.off(WebSocketMessageType.BET_ACCEPTED, handleBetUpdate);
+      webSocketService.off(WebSocketMessageType.BET_CANCELLED, handleBetUpdate);
+      webSocketService.off(WebSocketMessageType.FIGHT_RESULT, handleFightResult);
+    };
+  }, [isAuthenticated, loadData]);
 
   if (!isAuthenticated) {
     return (
