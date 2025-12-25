@@ -635,7 +635,7 @@ export default function FightDetails() {
                     <button
                       onClick={() => setSelectedFighter('A')}
                       className={`p-4 rounded-xl border-2 transition-all text-left ${selectedFighter === 'A'
-                        ? 'border-blue-500 bg-blue-50'
+                        ? 'border-blue-500 bg-blue-50 text-gray-900'
                         : 'border-gray-200 hover:border-blue-300'
                         }`}
                     >
@@ -655,7 +655,7 @@ export default function FightDetails() {
                     <button
                       onClick={() => setSelectedFighter('B')}
                       className={`p-4 rounded-xl border-2 transition-all text-left ${selectedFighter === 'B'
-                        ? 'border-red-500 bg-red-50'
+                        ? 'border-red-500 bg-red-50 text-gray-900'
                         : 'border-gray-200 hover:border-red-300'
                         }`}
                     >
@@ -682,7 +682,7 @@ export default function FightDetails() {
                     value={betAmount}
                     onChange={(e) => setBetAmount(e.target.value)}
                     placeholder="Ex: 5000"
-                    className="w-full px-4 py-3 rounded-xl border bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                    className="w-full px-4 py-3 rounded-xl border bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
                     min={fight.dayEvent?.minBetAmount || "100"}
                     max={fight.dayEvent?.maxBetAmount || "1000000"}
                     step="100"
