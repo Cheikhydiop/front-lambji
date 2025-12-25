@@ -3,12 +3,13 @@ import { Users, Swords, Trophy, Wallet, TrendingUp, TrendingDown, Clock, AlertCi
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { ADMIN_PATH } from '@/config/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { adminService, DashboardStats } from '@/services/AdminService';
+import { adminService, DashboardStats, AnalyticsData } from '@/services/AdminService';
 import { fightService, Fight } from '@/services/FightService';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { webSocketService, WebSocketMessageType } from '@/services/WebSocketService';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 
 const mockStats: DashboardStats = {
   totalUsers: 1234,
@@ -29,6 +30,7 @@ const mockStats: DashboardStats = {
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [ongoingFights, setOngoingFights] = useState<Fight[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -66,15 +68,17 @@ export default function AdminDashboard() {
 
   const loadData = async () => {
     try {
-      const [statsRes, fightsRes] = await Promise.all([
+      const [statsRes, fightsRes, analyticsRes] = await Promise.all([
         adminService.getDashboardStats(),
-        fightService.getFights({ status: 'ONGOING' })
+        fightService.getFights({ status: 'ONGOING' }),
+        adminService.getAnalytics()
       ]);
 
       if (statsRes.data) setStats(statsRes.data);
       else setStats(mockStats);
 
       if (fightsRes.data) setOngoingFights(fightsRes.data);
+      if (analyticsRes.data) setAnalytics(analyticsRes.data);
     } catch {
       setStats(mockStats);
     } finally {
@@ -91,6 +95,15 @@ export default function AdminDashboard() {
       </AdminLayout>
     );
   }
+
+  // Format data for charts
+  const financialData = analytics?.deposits.map((d) => ({
+    date: d.date,
+    deposits: d.total,
+    withdrawals: analytics.withdrawals.find(w => w.date === d.date)?.total || 0,
+  })) || [];
+
+  const commissionData = analytics?.commissions || [];
 
   const statCards = [
     {
@@ -156,6 +169,84 @@ export default function AdminDashboard() {
               </Card>
             );
           })}
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm font-medium">Flux Financier (Derniers 7 jours)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={financialData}>
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.1} vertical={false} />
+                    <XAxis
+                      dataKey="date"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => new Date(value).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
+                    />
+                    <YAxis
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => `${(value / 1000)}k`}
+                    />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '8px' }}
+                      itemStyle={{ fontSize: '12px' }}
+                      formatter={(value: number) => [`${value.toLocaleString()} F`, '']}
+                    />
+                    <Bar dataKey="deposits" name="Dépôts" fill="#10b981" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="withdrawals" name="Retraits" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm font-medium">Commissions Générées</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={commissionData}>
+                    <defs>
+                      <linearGradient id="colorCommission" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.1} vertical={false} />
+                    <XAxis
+                      dataKey="date"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => new Date(value).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
+                    />
+                    <YAxis
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => `${(value / 1000)}k`}
+                    />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '8px' }}
+                      itemStyle={{ color: '#8b5cf6', fontSize: '12px' }}
+                      formatter={(value: number) => [`${value.toLocaleString()} F`, 'Commission']}
+                    />
+                    <Area type="monotone" dataKey="total" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorCommission)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Volume & Commissions */}

@@ -87,6 +87,12 @@ export interface CreateEventPayload {
   maxBetAmount?: number;
 }
 
+export interface AnalyticsData {
+  deposits: { date: string; total: number }[];
+  withdrawals: { date: string; total: number }[];
+  commissions: { date: string; total: number }[];
+}
+
 // Supprimé ValidateResultPayload d'ici car déplacé vers FightService
 
 class AdminService extends BaseService {
@@ -97,6 +103,10 @@ class AdminService extends BaseService {
   // Dashboard
   getDashboardStats(): Promise<ApiResponse<DashboardStats>> {
     return this.get<DashboardStats>('/stats');
+  }
+
+  getAnalytics(): Promise<ApiResponse<AnalyticsData>> {
+    return this.get<AnalyticsData>('/analytics');
   }
 
   // Users Management
