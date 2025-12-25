@@ -136,7 +136,6 @@ export function FightCard({
             isFinished && result?.winner === 'A' ? "text-yellow-600 font-bold" : "text-foreground",
             isFinished && result?.winner !== 'A' && result?.winner !== 'DRAW' && "text-muted-foreground"
           )}>{fighterA.name}</h3>
-          <p className="text-xs text-muted-foreground">{fighterA.wins}V - {fighterA.losses}D</p>
         </div>
 
         {/* VS */}
@@ -177,7 +176,6 @@ export function FightCard({
             isFinished && result?.winner === 'B' ? "text-yellow-600 font-bold" : "text-foreground",
             isFinished && result?.winner !== 'B' && result?.winner !== 'DRAW' && "text-muted-foreground"
           )}>{fighterB.name}</h3>
-          <p className="text-xs text-muted-foreground">{fighterB.wins}V - {fighterB.losses}D</p>
         </div>
       </div>
 
