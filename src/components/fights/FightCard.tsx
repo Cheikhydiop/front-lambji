@@ -168,7 +168,7 @@ export function FightCard({
             {fighterB.profileImage ? (
               <img src={fighterB.profileImage} alt={fighterB.name} className="w-full h-full object-cover" />
             ) : (
-              <img src="/default-fighter.png" alt="Fighter" className="w-full h-full object-cover opacity-50 grayscale" />
+              <img src="/default-fighter.png" alt="Fighter" className="w-full h-full object-cover opacity-50 grayscale scale-x-[-1]" />
             )}
           </div>
           <h3 className={cn(
