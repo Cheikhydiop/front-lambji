@@ -156,19 +156,22 @@ export default function AdminFighters() {
         height: formData.height ? parseFloat(formData.height) : undefined,
       };
 
+      let response;
+
       if (editingFighter) {
-        await fighterService.updateFighter(editingFighter.id, payload);
-        toast({
-          title: 'Succès',
-          description: `${formData.name} a été mis à jour avec succès`,
-        });
+        response = await fighterService.updateFighter(editingFighter.id, payload);
       } else {
-        await fighterService.createFighter(payload);
-        toast({
-          title: 'Succès',
-          description: `${formData.name} a été créé avec succès`,
-        });
+        response = await fighterService.createFighter(payload);
       }
+
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
+      toast({
+        title: 'Succès',
+        description: `${formData.name} a été ${editingFighter ? 'mis à jour' : 'créé'} avec succès`,
+      });
 
       setDialogOpen(false);
       resetForm();
