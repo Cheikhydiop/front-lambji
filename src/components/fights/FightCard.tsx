@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Clock, Users, Trophy } from 'lucide-react';
+import { Clock, Users, Trophy, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -128,7 +128,7 @@ export function FightCard({
             {fighterA.profileImage ? (
               <img src={fighterA.profileImage} alt={fighterA.name} className="w-full h-full object-cover" />
             ) : (
-              <Trophy className="w-6 h-6 text-primary" />
+              <User className="w-8 h-8 text-primary/50" />
             )}
           </div>
           <h3 className={cn(
@@ -168,7 +168,7 @@ export function FightCard({
             {fighterB.profileImage ? (
               <img src={fighterB.profileImage} alt={fighterB.name} className="w-full h-full object-cover" />
             ) : (
-              <Trophy className="w-6 h-6 text-secondary" />
+              <User className="w-8 h-8 text-secondary/50" />
             )}
           </div>
           <h3 className={cn(
