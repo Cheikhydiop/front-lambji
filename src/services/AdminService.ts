@@ -18,6 +18,8 @@ export interface DashboardStats {
   pendingWithdrawals: number;
   todayDeposits: number;
   todayWithdrawals: number;
+  totalCommission?: number;
+  todayCommission?: number;
 }
 
 export interface AuditLog {

@@ -23,6 +23,8 @@ const mockStats: DashboardStats = {
   pendingWithdrawals: 12,
   todayDeposits: 2500000,
   todayWithdrawals: 1800000,
+  totalCommission: 150000,
+  todayCommission: 12000,
 };
 
 export default function AdminDashboard() {
@@ -156,12 +158,12 @@ export default function AdminDashboard() {
           })}
         </div>
 
-        {/* Volume Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Volume & Commissions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Volume Total des Paris
+                Volume Total
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -174,8 +176,25 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Wallet className="w-4 h-4 text-emerald-500" />
+                Commissions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold text-emerald-500">
+                {(stats?.totalCommission || 0).toLocaleString()} F
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                +{(stats?.todayCommission || 0).toLocaleString()} F aujourd'hui
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-accent" />
-                Dépôts Aujourd'hui
+                Dépôts (24h)
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -189,7 +208,7 @@ export default function AdminDashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <TrendingDown className="w-4 h-4 text-destructive" />
-                Retraits Aujourd'hui
+                Retraits (24h)
               </CardTitle>
             </CardHeader>
             <CardContent>
