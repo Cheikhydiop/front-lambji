@@ -477,19 +477,19 @@ export default function Fights() {
 
                 {/* Résultat pour les combats terminés */}
                 {fight.status === 'FINISHED' && fight.result && (
-                  <div className="mt-3 p-3 bg-gray-50 rounded-lg border">
+                  <div className="mt-3 p-3 bg-white/5 rounded-lg border border-white/10">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                        <span className="font-medium">Résultat :</span>
-                        <span>
+                        <span className="font-medium text-white">Résultat :</span>
+                        <span className="text-gray-200">
                           {fight.result.winner === 'A' && `Victoire de ${fight.fighterA.name}`}
                           {fight.result.winner === 'B' && `Victoire de ${fight.fighterB.name}`}
                           {fight.result.winner === 'DRAW' && 'Match nul'}
                         </span>
                       </div>
                       {fight.result.victoryMethod && (
-                        <span className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded">
+                        <span className="px-2 py-1 bg-white/10 text-white text-xs rounded border border-white/10">
                           {fight.result.victoryMethod}
                         </span>
                       )}
