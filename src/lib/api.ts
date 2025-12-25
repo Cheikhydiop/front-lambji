@@ -1,5 +1,7 @@
 // API Configuration and HTTP Client
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://jealous-giraffe-ndigueul-efe7a113.koyeb.app/api';
+import config from '../config';
+
+const API_BASE_URL = config.apiUrl;
 
 export interface ApiResponse<T> {
   data?: T;
@@ -70,7 +72,7 @@ class ApiClient {
 
     try {
       const startTime = performance.now();
-      
+
       const response = await fetch(url, {
         ...options,
         headers,
@@ -82,7 +84,7 @@ class ApiClient {
       // Vérifier le type de contenu avant de parser
       const contentType = response.headers.get('content-type');
       let data;
-      
+
       if (contentType && contentType.includes('application/json')) {
         data = await response.json();
       } else {
@@ -104,20 +106,20 @@ class ApiClient {
           console.warn('⚠️ Token invalide ou expiré, déconnexion...');
           this.clearToken();
         }
-        
+
         const errorMessage = data.message || data.error || 'Une erreur est survenue';
         console.error(`❌ Erreur API [${response.status}]:`, errorMessage);
-        
-        return { 
-          error: errorMessage, 
+
+        return {
+          error: errorMessage,
           message: data.message,
-          status: response.status 
+          status: response.status
         };
       }
 
-      return { 
+      return {
         data,
-        status: response.status 
+        status: response.status
       };
     } catch (error) {
       // 🔥 Log d'erreur réseau
@@ -126,8 +128,8 @@ class ApiClient {
       console.log('🌐 URL tentée:', url);
       console.log('🔑 Token utilisé:', this.token);
       console.groupEnd();
-      
-      return { 
+
+      return {
         error: 'Erreur de connexion au serveur',
         message: 'Impossible de se connecter au serveur. Vérifiez votre connexion internet.'
       };
@@ -173,7 +175,7 @@ class ApiClient {
   async upload<T>(endpoint: string, file: File, fieldName = 'file'): Promise<ApiResponse<T>> {
     const formData = new FormData();
     formData.append(fieldName, file);
-    
+
     return this.request<T>(endpoint, {
       method: 'POST',
       headers: {

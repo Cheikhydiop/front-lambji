@@ -25,6 +25,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { fightService, betService } from '@/services';
+import { webSocketService, WebSocketMessageType } from '@/services/WebSocketService';
 import config from '@/config';
 
 export default function FightDetails() {
@@ -58,6 +59,19 @@ export default function FightDetails() {
   const [betAmount, setBetAmount] = useState<string>('');
   const [isCreatingBet, setIsCreatingBet] = useState(false);
 
+
+  const fetchAvailableBets = async () => {
+    if (!fightId) return;
+    try {
+      const betsResponse = await betService.getAvailableBets(fightId);
+      if (betsResponse.data) {
+        setAvailableBets(betsResponse.data);
+      }
+    } catch (betsError) {
+      console.warn('Erreur lors de la récupération des paris:', betsError);
+    }
+  };
+
   useEffect(() => {
     // Si aucun ID n'est trouvé
     if (!fightId || fightId === 'fights' || fightId === '') {
@@ -82,16 +96,7 @@ export default function FightDetails() {
 
         if (fightResponse.data) {
           setFight(fightResponse.data);
-
-          // Récupérer les paris disponibles
-          try {
-            const betsResponse = await betService.getAvailableBets(fightId);
-            if (betsResponse.data) {
-              setAvailableBets(betsResponse.data);
-            }
-          } catch (betsError) {
-            console.warn('Erreur lors de la récupération des paris:', betsError);
-          }
+          await fetchAvailableBets();
         } else {
           toast({
             title: 'Erreur',
@@ -131,6 +136,31 @@ export default function FightDetails() {
 
     fetchFightDetails();
   }, [fightId, toast]);
+
+  // Synchronisation temps réel
+  useEffect(() => {
+    if (!fightId) return;
+
+    const handleBetUpdate = (data: any) => {
+      // Vérifier si la mise à jour concerne ce combat
+      const bet = data.bet || data;
+      // Si l'objet contient fightId ou si c'est une notification générique de pari
+      if (bet && (bet.fightId === fightId || data.fightId === fightId)) {
+        console.log('Mise à jour temps réel reçue via WebSocket');
+        fetchAvailableBets();
+      }
+    };
+
+    webSocketService.on(WebSocketMessageType.BET_CREATED, handleBetUpdate);
+    webSocketService.on(WebSocketMessageType.BET_ACCEPTED, handleBetUpdate);
+    webSocketService.on(WebSocketMessageType.BET_CANCELLED, handleBetUpdate);
+
+    return () => {
+      webSocketService.off(WebSocketMessageType.BET_CREATED, handleBetUpdate);
+      webSocketService.off(WebSocketMessageType.BET_ACCEPTED, handleBetUpdate);
+      webSocketService.off(WebSocketMessageType.BET_CANCELLED, handleBetUpdate);
+    };
+  }, [fightId]);
 
   const handleCreateBet = async () => {
     if (!selectedFighter || !betAmount || !fight) return;
@@ -192,11 +222,15 @@ export default function FightDetails() {
 
     setIsCreatingBet(true);
     try {
-      await betService.createBet({
+      const response = await betService.createBet({
         fightId: fight.id,
         amount,
         chosenFighter: selectedFighter,
       });
+
+      if (response.error) {
+        throw new Error(response.error);
+      }
 
       toast({
         title: 'Pari créé !',
@@ -253,7 +287,11 @@ export default function FightDetails() {
     }
 
     try {
-      await betService.acceptBet(betId);
+      const response = await betService.acceptBet(betId);
+
+      if (response.error) {
+        throw new Error(response.error);
+      }
 
       toast({
         title: 'Pari accepté !',
