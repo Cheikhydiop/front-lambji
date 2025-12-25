@@ -128,7 +128,7 @@ export function FightCard({
             {fighterA.profileImage ? (
               <img src={fighterA.profileImage} alt={fighterA.name} className="w-full h-full object-cover" />
             ) : (
-              <User className="w-8 h-8 text-primary/50" />
+              <img src="/default-fighter.png" alt="Fighter" className="w-full h-full object-cover opacity-50 grayscale" />
             )}
           </div>
           <h3 className={cn(
@@ -168,7 +168,7 @@ export function FightCard({
             {fighterB.profileImage ? (
               <img src={fighterB.profileImage} alt={fighterB.name} className="w-full h-full object-cover" />
             ) : (
-              <User className="w-8 h-8 text-secondary/50" />
+              <img src="/default-fighter.png" alt="Fighter" className="w-full h-full object-cover opacity-50 grayscale" />
             )}
           </div>
           <h3 className={cn(
