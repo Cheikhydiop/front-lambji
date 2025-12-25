@@ -49,7 +49,9 @@ class FighterService extends BaseService {
     const searchParams = new URLSearchParams();
 
     // Le backend nécessite ces paramètres avec des valeurs par défaut
-    searchParams.set('limit', (params?.limit || 500).toString());
+    // Note: On reste à 100 pour l'instant pour éviter les erreurs de validation sur les backends non mis à jour
+    const limit = params?.limit || 100;
+    searchParams.set('limit', limit.toString());
     searchParams.set('offset', (params?.offset || 0).toString());
 
     // Paramètres optionnels
@@ -69,11 +71,11 @@ class FighterService extends BaseService {
 
       // Sinon, utiliser la route /top comme fallback (bug du backend avec validation)
       console.warn('[FighterService] Route principale échouée ou vide, utilisation de /top comme fallback');
-      return this.getTopFighters();
+      return this.getTopFighters(limit);
     } catch (error: any) {
       // En cas d'erreur, utiliser la route /top
       console.error('[FighterService] Erreur sur route principale:', error);
-      return this.getTopFighters();
+      return this.getTopFighters(limit);
     }
   }
 
@@ -81,8 +83,8 @@ class FighterService extends BaseService {
     return this.get<Fighter>(`/${fighterId}`);
   }
 
-  async getTopFighters(): Promise<ApiResponse<Fighter[]>> {
-    return this.get<Fighter[]>('/top');
+  async getTopFighters(limit: number = 100): Promise<ApiResponse<Fighter[]>> {
+    return this.get<Fighter[]>(`/top?limit=${limit}`);
   }
 
   async searchFighters(query: string): Promise<ApiResponse<Fighter[]>> {
