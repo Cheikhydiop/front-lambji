@@ -16,7 +16,7 @@ import type { Bet } from '@/services/BetService';
 import { webSocketService, WebSocketMessageType } from '@/services/WebSocketService';
 
 type TabType = 'active' | 'history';
-type FilterStatus = 'all' | 'PENDING' | 'ACCEPTED' | 'WON' | 'LOST' | 'CANCELLED' | 'REFUNDED';
+type FilterStatus = 'all' | 'PENDING' | 'ACCEPTED' | 'WON' | 'LOST' | 'CANCELLED' | 'REFUNDED' | 'POSTPONED';
 
 interface BetWithRole extends Bet {
   isCreator?: boolean;
@@ -43,6 +43,7 @@ export default function MyBets() {
     { value: 'LOST', label: 'Perdus', color: 'bg-red-500' },
     { value: 'CANCELLED', label: 'Annulés', color: 'bg-gray-400' },
     { value: 'REFUNDED', label: 'Remboursés', color: 'bg-purple-500' },
+    { value: 'POSTPONED', label: 'Reportés', color: 'bg-orange-400' },
   ];
 
   // Charger les données
@@ -106,7 +107,8 @@ export default function MyBets() {
     if (activeTab === 'active') {
       filtered = filtered.filter(bet => ['PENDING', 'ACCEPTED'].includes(bet.status));
     } else if (activeTab === 'history') {
-      filtered = filtered.filter(bet => ['WON', 'LOST', 'CANCELLED', 'REFUNDED'].includes(bet.status));
+      // Tout ce qui n'est pas actif va dans l'historique
+      filtered = filtered.filter(bet => !['PENDING', 'ACCEPTED'].includes(bet.status));
     }
 
     // Filtrer par statut sélectionné
@@ -122,13 +124,14 @@ export default function MyBets() {
 
   // Calculer les statistiques en temps réel
   const calculatedStats = useMemo(() => {
-    const activeBets = bets.filter(bet => ['PENDING', 'ACCEPTED'].includes(bet.status));
-    const historyBets = bets.filter(bet => ['WON', 'LOST', 'CANCELLED', 'REFUNDED'].includes(bet.status));
+    const activeStatus = ['PENDING', 'ACCEPTED'];
+    const activeBets = bets.filter(bet => activeStatus.includes(bet.status));
+    const historyBets = bets.filter(bet => !activeStatus.includes(bet.status));
     const wonBets = bets.filter(bet => bet.status === 'WON');
     const lostBets = bets.filter(bet => bet.status === 'LOST');
     const pendingBets = bets.filter(bet => bet.status === 'PENDING');
     const acceptedBets = bets.filter(bet => bet.status === 'ACCEPTED');
-    const cancelledBets = bets.filter(bet => bet.status === 'CANCELLED');
+    const cancelledBets = bets.filter(bet => ['CANCELLED', 'REFUNDED', 'POSTPONED'].includes(bet.status));
 
     // Calcul du profit total (seulement pour les paris terminés)
     const totalWinnings = wonBets.reduce((sum, bet) => sum + (bet.actualWin || 0), 0);
@@ -192,6 +195,7 @@ export default function MyBets() {
       case 'LOST': return 'bg-red-100 text-red-800';
       case 'CANCELLED': return 'bg-gray-100 text-gray-800';
       case 'REFUNDED': return 'bg-purple-100 text-purple-800';
+      case 'POSTPONED': return 'bg-orange-100 text-orange-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -205,6 +209,7 @@ export default function MyBets() {
       case 'LOST': return 'Perdu';
       case 'CANCELLED': return 'Annulé';
       case 'REFUNDED': return 'Remboursé';
+      case 'POSTPONED': return 'Reporté';
       default: return status;
     }
   };
@@ -389,7 +394,7 @@ export default function MyBets() {
 
         {/* Détails par statut */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
-          {['WON', 'LOST', 'PENDING', 'ACCEPTED', 'CANCELLED'].map((status) => {
+          {['WON', 'LOST', 'PENDING', 'ACCEPTED', 'CANCELLED', 'REFUNDED', 'POSTPONED'].map((status) => {
             const count = bets.filter(bet => bet.status === status).length;
             const amount = calculatedStats.investedByStatus[status as keyof typeof calculatedStats.investedByStatus] || 0;
 
@@ -417,7 +422,14 @@ export default function MyBets() {
         </div>
 
         {/* Onglets */}
-        <Tabs defaultValue="active" value={activeTab} onValueChange={(v) => setActiveTab(v as TabType)}>
+        <Tabs
+          defaultValue="active"
+          value={activeTab}
+          onValueChange={(v) => {
+            setActiveTab(v as TabType);
+            setSelectedFilter('all'); // Réinitialiser le filtre lors du changement d'onglet
+          }}
+        >
           <TabsList className="grid w-full grid-cols-2 mb-3">
             <TabsTrigger value="active" className="flex items-center gap-2">
               <Clock className="w-4 h-4" />
@@ -612,21 +624,21 @@ export default function MyBets() {
                         {/* Informations financières */}
                         {(['WON', 'LOST', 'CANCELLED', 'REFUNDED'].includes(bet.status) || bet.potentialWin) && (
                           <div className={`p-4 rounded-xl mb-4 relative overflow-hidden flex items-center justify-between ${bet.status === 'WON' ? 'bg-emerald-950/20 ring-1 ring-emerald-900/30' :
-                              bet.status === 'LOST' ? 'bg-red-950/20 ring-1 ring-red-900/30' :
-                                ['CANCELLED', 'REFUNDED'].includes(bet.status) ? 'bg-gray-100/10 ring-1 ring-gray-100/20' :
-                                  'bg-blue-950/20 ring-1 ring-blue-900/30'
+                            bet.status === 'LOST' ? 'bg-red-950/20 ring-1 ring-red-900/30' :
+                              ['CANCELLED', 'REFUNDED'].includes(bet.status) ? 'bg-gray-100/10 ring-1 ring-gray-100/20' :
+                                'bg-blue-950/20 ring-1 ring-blue-900/30'
                             }`}>
                             <div className={`absolute inset-0 opacity-10 ${bet.status === 'WON' ? 'bg-emerald-500' :
-                                bet.status === 'LOST' ? 'bg-red-500' :
-                                  ['CANCELLED', 'REFUNDED'].includes(bet.status) ? 'bg-gray-500' :
-                                    'bg-blue-500'
+                              bet.status === 'LOST' ? 'bg-red-500' :
+                                ['CANCELLED', 'REFUNDED'].includes(bet.status) ? 'bg-gray-500' :
+                                  'bg-blue-500'
                               }`}></div>
 
                             <div className="relative z-10">
                               <p className={`text-xs font-bold uppercase tracking-wide mb-0.5 ${bet.status === 'WON' ? 'text-emerald-500' :
-                                  bet.status === 'LOST' ? 'text-red-500' :
-                                    ['CANCELLED', 'REFUNDED'].includes(bet.status) ? 'text-gray-400' :
-                                      'text-blue-500'
+                                bet.status === 'LOST' ? 'text-red-500' :
+                                  ['CANCELLED', 'REFUNDED'].includes(bet.status) ? 'text-gray-400' :
+                                    'text-blue-500'
                                 }`}>
                                 {bet.status === 'WON' ? 'Gain réalisé' :
                                   bet.status === 'LOST' ? 'Perte' :
@@ -636,9 +648,9 @@ export default function MyBets() {
                             </div>
 
                             <p className={`relative z-10 text-xl font-black ${bet.status === 'WON' ? 'text-emerald-400' :
-                                bet.status === 'LOST' ? 'text-red-400' :
-                                  ['CANCELLED', 'REFUNDED'].includes(bet.status) ? 'text-gray-400' :
-                                    'text-blue-400'
+                              bet.status === 'LOST' ? 'text-red-400' :
+                                ['CANCELLED', 'REFUNDED'].includes(bet.status) ? 'text-gray-400' :
+                                  'text-blue-400'
                               }`}>
                               {formatAmount(
                                 bet.status === 'WON' ? (bet.actualWin || 0) :
