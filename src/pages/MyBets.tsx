@@ -609,28 +609,43 @@ export default function MyBets() {
                         </div>
 
                         {/* Informations financières */}
-                        {(bet.actualWin || bet.potentialWin) && (
+                        {/* Informations financières */}
+                        {(['WON', 'LOST', 'CANCELLED', 'REFUNDED'].includes(bet.status) || bet.potentialWin) && (
                           <div className={`p-4 rounded-xl mb-4 relative overflow-hidden flex items-center justify-between ${bet.status === 'WON' ? 'bg-emerald-950/20 ring-1 ring-emerald-900/30' :
-                            bet.status === 'LOST' ? 'bg-red-950/20 ring-1 ring-red-900/30' :
-                              'bg-blue-950/20 ring-1 ring-blue-900/30'
+                              bet.status === 'LOST' ? 'bg-red-950/20 ring-1 ring-red-900/30' :
+                                ['CANCELLED', 'REFUNDED'].includes(bet.status) ? 'bg-gray-100/10 ring-1 ring-gray-100/20' :
+                                  'bg-blue-950/20 ring-1 ring-blue-900/30'
                             }`}>
                             <div className={`absolute inset-0 opacity-10 ${bet.status === 'WON' ? 'bg-emerald-500' :
-                              bet.status === 'LOST' ? 'bg-red-500' : 'bg-blue-500'
+                                bet.status === 'LOST' ? 'bg-red-500' :
+                                  ['CANCELLED', 'REFUNDED'].includes(bet.status) ? 'bg-gray-500' :
+                                    'bg-blue-500'
                               }`}></div>
 
                             <div className="relative z-10">
                               <p className={`text-xs font-bold uppercase tracking-wide mb-0.5 ${bet.status === 'WON' ? 'text-emerald-500' :
-                                bet.status === 'LOST' ? 'text-red-500' : 'text-blue-500'
+                                  bet.status === 'LOST' ? 'text-red-500' :
+                                    ['CANCELLED', 'REFUNDED'].includes(bet.status) ? 'text-gray-400' :
+                                      'text-blue-500'
                                 }`}>
                                 {bet.status === 'WON' ? 'Gain réalisé' :
-                                  bet.status === 'LOST' ? 'Perte' : 'Gain potentiel'}
+                                  bet.status === 'LOST' ? 'Perte' :
+                                    ['CANCELLED', 'REFUNDED'].includes(bet.status) ? 'Remboursé' :
+                                      'Gain potentiel'}
                               </p>
                             </div>
 
                             <p className={`relative z-10 text-xl font-black ${bet.status === 'WON' ? 'text-emerald-400' :
-                              bet.status === 'LOST' ? 'text-red-400' : 'text-blue-400'
+                                bet.status === 'LOST' ? 'text-red-400' :
+                                  ['CANCELLED', 'REFUNDED'].includes(bet.status) ? 'text-gray-400' :
+                                    'text-blue-400'
                               }`}>
-                              {formatAmount(bet.actualWin || bet.potentialWin || 0)} <span className="text-xs">FCFA</span>
+                              {formatAmount(
+                                bet.status === 'WON' ? (bet.actualWin || 0) :
+                                  bet.status === 'LOST' ? 0 :
+                                    ['CANCELLED', 'REFUNDED'].includes(bet.status) ? bet.amount :
+                                      (bet.potentialWin || 0)
+                              )} <span className="text-xs">FCFA</span>
                             </p>
                           </div>
                         )}
