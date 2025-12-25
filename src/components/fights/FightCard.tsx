@@ -121,14 +121,14 @@ export function FightCard({
             </div>
           )}
           <div className={cn(
-            "w-16 h-16 mx-auto mb-2 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2",
+            "w-16 h-16 mx-auto mb-2 rounded-full bg-black/40 flex items-center justify-center overflow-hidden border-2 shadow-inner",
             isFinished && result?.winner === 'A' ? "border-yellow-500 ring-4 ring-yellow-500/20" : "border-primary/30",
             isFinished && result?.winner !== 'A' && result?.winner !== 'DRAW' && "opacity-50"
           )}>
             {fighterA.profileImage ? (
               <img src={fighterA.profileImage} alt={fighterA.name} className="w-full h-full object-cover" />
             ) : (
-              <img src="/default-fighter.png" alt="Fighter" className="w-full h-full object-cover opacity-50 grayscale" />
+              <img src="/default-fighter.png" alt="Fighter" className="w-full h-full object-cover" />
             )}
           </div>
           <h3 className={cn(
@@ -161,14 +161,14 @@ export function FightCard({
             </div>
           )}
           <div className={cn(
-            "w-16 h-16 mx-auto mb-2 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2",
+            "w-16 h-16 mx-auto mb-2 rounded-full bg-black/40 flex items-center justify-center overflow-hidden border-2 shadow-inner",
             isFinished && result?.winner === 'B' ? "border-yellow-500 ring-4 ring-yellow-500/20" : "border-secondary/30",
             isFinished && result?.winner !== 'B' && result?.winner !== 'DRAW' && "opacity-50"
           )}>
             {fighterB.profileImage ? (
               <img src={fighterB.profileImage} alt={fighterB.name} className="w-full h-full object-cover" />
             ) : (
-              <img src="/default-fighter.png" alt="Fighter" className="w-full h-full object-cover opacity-50 grayscale scale-x-[-1]" />
+              <img src="/default-fighter.png" alt="Fighter" className="w-full h-full object-cover scale-x-[-1]" />
             )}
           </div>
           <h3 className={cn(
