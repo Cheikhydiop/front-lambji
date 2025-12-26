@@ -10,7 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import betService, { BetStats } from '@/services/BetService';
-
+import { webSocketService, WebSocketMessageType } from '@/services/WebSocketService';
 interface ProfileProps {
   tab?: string;
 }
@@ -31,9 +31,35 @@ export default function Profile({ tab }: ProfileProps) {
   const [stats, setStats] = useState<BetStats | null>(null);
   const [isLoadingStats, setIsLoadingStats] = useState(false);
 
+
+
   useEffect(() => {
     if (isAuthenticated) {
       loadStats();
+
+      // Subscribe to relevant events for stats update
+      const handleStatsUpdate = () => {
+        loadStats();
+      };
+
+      webSocketService.on(WebSocketMessageType.BET_WON, handleStatsUpdate);
+      webSocketService.on(WebSocketMessageType.BET_LOST, handleStatsUpdate);
+      webSocketService.on(WebSocketMessageType.BET_CANCELLED, handleStatsUpdate);
+      webSocketService.on(WebSocketMessageType.BET_REFUNDED, handleStatsUpdate);
+      // Also BET_ACCEPTED changes "active" bets but implies "Total Bets" might increment if "Total Bets" counts all? 
+      // Actually usually Total Bets counts finished bets or all? 
+      // The stats query counts all (count(*)). So CREATED (PENDING) counts too.
+      // So BET_CREATED (if viewed by creator) or just on mount is enough.
+      // But if stats counts ACCEPTED vs WON, settlement changes stats.
+      webSocketService.on(WebSocketMessageType.BET_ACCEPTED, handleStatsUpdate);
+
+      return () => {
+        webSocketService.off(WebSocketMessageType.BET_WON, handleStatsUpdate);
+        webSocketService.off(WebSocketMessageType.BET_LOST, handleStatsUpdate);
+        webSocketService.off(WebSocketMessageType.BET_CANCELLED, handleStatsUpdate);
+        webSocketService.off(WebSocketMessageType.BET_REFUNDED, handleStatsUpdate);
+        webSocketService.off(WebSocketMessageType.BET_ACCEPTED, handleStatsUpdate);
+      };
     }
   }, [isAuthenticated]);
 
