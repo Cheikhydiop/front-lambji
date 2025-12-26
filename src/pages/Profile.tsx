@@ -331,7 +331,7 @@ export default function Profile({ tab }: ProfileProps) {
 
         {/* Version */}
         <p className="text-center text-xs text-muted-foreground pb-4">
-          MBAYAR BET v1.0.0
+          Lamb Ji v1.0.0
         </p>
       </div>
     </AppLayout>

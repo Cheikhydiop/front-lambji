@@ -17,8 +17,8 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png'],
       manifest: {
-        name: 'MBAYAR BET - Paris Luttе Sénégalaise',
-        short_name: 'MBAYAR BET',
+        name: 'Mbayar - Paris Lamb',
+        short_name: 'Mbayar',
         description: 'Application de paris sur les combats de lutte sénégalaise',
         theme_color: '#d4af37',
         background_color: '#0f172a',
