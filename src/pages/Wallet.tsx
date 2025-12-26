@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { transactionService, Transaction } from '@/services/TransactionService';
+import { webSocketService, WebSocketMessageType } from '@/services/WebSocketService';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 type ActionType = 'deposit' | 'withdraw' | null;
@@ -43,6 +44,35 @@ export default function Wallet({ tab }: { tab?: string }) {
     if (isAuthenticated) {
       loadHistory();
     }
+  }, [isAuthenticated]);
+
+  // Écouter les événements WebSocket pour rafraîchir l'historique
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const handleTransactionUpdate = (payload: any) => {
+      console.log('[Wallet] Mise à jour transaction reçue:', payload);
+      loadHistory();
+      // Le solde est géré automatiquement par AuthContext, mais on peut forcer un refresh si besoin
+      refreshUser();
+    };
+
+    // S'abonner aux événements qui affectent l'historique
+    webSocketService.on(WebSocketMessageType.TRANSACTION_CONFIRMED, handleTransactionUpdate);
+    webSocketService.on(WebSocketMessageType.TRANSACTION_FAILED, handleTransactionUpdate);
+    webSocketService.on(WebSocketMessageType.WALLET_UPDATE, handleTransactionUpdate);
+    webSocketService.on(WebSocketMessageType.BET_WON, handleTransactionUpdate);
+    webSocketService.on(WebSocketMessageType.BET_CREATED, handleTransactionUpdate); // Création = débit
+    webSocketService.on(WebSocketMessageType.BET_ACCEPTED, handleTransactionUpdate); // Acceptation = débit
+
+    return () => {
+      webSocketService.off(WebSocketMessageType.TRANSACTION_CONFIRMED, handleTransactionUpdate);
+      webSocketService.off(WebSocketMessageType.TRANSACTION_FAILED, handleTransactionUpdate);
+      webSocketService.off(WebSocketMessageType.WALLET_UPDATE, handleTransactionUpdate);
+      webSocketService.off(WebSocketMessageType.BET_WON, handleTransactionUpdate);
+      webSocketService.off(WebSocketMessageType.BET_CREATED, handleTransactionUpdate);
+      webSocketService.off(WebSocketMessageType.BET_ACCEPTED, handleTransactionUpdate);
+    };
   }, [isAuthenticated]);
 
   const loadHistory = async () => {
