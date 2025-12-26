@@ -97,6 +97,27 @@ export default function MyBets() {
 
     setIsLoading(true);
     loadData();
+
+    // Listen for realtime updates
+    const handleBetUpdate = () => {
+      loadData();
+    };
+
+    webSocketService.on(WebSocketMessageType.BET_WON, handleBetUpdate);
+    webSocketService.on(WebSocketMessageType.BET_LOST, handleBetUpdate);
+    webSocketService.on(WebSocketMessageType.BET_CANCELLED, handleBetUpdate);
+    webSocketService.on(WebSocketMessageType.BET_REFUNDED, handleBetUpdate);
+    webSocketService.on(WebSocketMessageType.BET_ACCEPTED, handleBetUpdate);
+    webSocketService.on(WebSocketMessageType.BET_CREATED, handleBetUpdate);
+
+    return () => {
+      webSocketService.off(WebSocketMessageType.BET_WON, handleBetUpdate);
+      webSocketService.off(WebSocketMessageType.BET_LOST, handleBetUpdate);
+      webSocketService.off(WebSocketMessageType.BET_CANCELLED, handleBetUpdate);
+      webSocketService.off(WebSocketMessageType.BET_REFUNDED, handleBetUpdate);
+      webSocketService.off(WebSocketMessageType.BET_ACCEPTED, handleBetUpdate);
+      webSocketService.off(WebSocketMessageType.BET_CREATED, handleBetUpdate);
+    };
   }, [isAuthenticated]);
 
   // Calculer les paris filtrés
