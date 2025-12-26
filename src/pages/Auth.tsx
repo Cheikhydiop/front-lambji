@@ -117,7 +117,7 @@ export default function Auth({ type }: AuthProps = {}) {
 
           toast({
             title: 'Connexion réussie',
-            description: 'Bienvenue sur Lamb Ji!',
+            description: 'Bienvenue sur MBAYAR BET!',
           });
 
           let userRole = result.user?.role;
@@ -249,8 +249,8 @@ export default function Auth({ type }: AuthProps = {}) {
       <div className="flex-1 flex flex-col justify-center px-6 pb-8">
         {/* Logo & Title */}
         <div className="text-center mb-8">
-          <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-gold flex items-center justify-center shadow-gold">
-            <span className="text-3xl font-bold text-primary-foreground">LJ</span>
+          <div className="w-32 h-32 mx-auto mb-4 flex items-center justify-center">
+            <img src="/logo.png" alt="MBAYAR BET" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">
             {getTitle()}

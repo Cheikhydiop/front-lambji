@@ -113,9 +113,12 @@ export default function Index() {
         {/* Header */}
         <header className="px-4 pt-4 pb-2">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gradient-gold">Lamb Ji</h1>
-              <p className="text-sm text-muted-foreground">Lutte Sénégalaise</p>
+            <div className="flex items-center gap-3">
+              <img src="/logo.png" alt="MBAYAR BET" className="h-12 w-auto object-contain" />
+              <div>
+                <h1 className="text-lg font-bold text-foreground">MBAYAR BET</h1>
+                <p className="text-xs text-muted-foreground">Lutte Sénégalaise</p>
+              </div>
             </div>
             <div className="flex items-center gap-2">
               {isAuthenticated ? (

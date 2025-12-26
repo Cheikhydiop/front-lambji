@@ -84,10 +84,8 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
           {/* Logo */}
           <div className="p-4 border-b border-border flex items-center justify-between">
             <Link to={ADMIN_PATH} className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-gold flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">LJ</span>
-              </div>
-              <span className="font-bold text-foreground">Lamb Ji Admin</span>
+              <img src="/logo.png" alt="MBAYAR BET" className="h-8 w-auto object-contain" />
+              <span className="font-bold text-foreground">MBAYAR BET Admin</span>
             </Link>
             <Button
               variant="ghost"
