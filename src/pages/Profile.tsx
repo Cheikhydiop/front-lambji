@@ -20,6 +20,7 @@ const menuItems = [
   { icon: Bell, label: 'Notifications', path: '/notifications' },
   { icon: Shield, label: 'Sécurité', path: '/profile/security' },
   { icon: Settings, label: 'Paramètres', path: '/profile/settings' },
+  { icon: FileText, label: 'Conditions d\'Utilisation', path: '/terms' },
   { icon: HelpCircle, label: 'Aide & Support', path: '/help' },
 ];
 

@@ -408,6 +408,20 @@ export default function Auth({ type }: AuthProps = {}) {
                     ? 'Envoyer le lien'
                     : 'Réinitialiser'}
           </Button>
+
+          {/* Terms of Service for Registration */}
+          {mode === 'register' && (
+            <p className="text-xs text-center text-muted-foreground mt-2">
+              En vous inscrivant, vous acceptez nos{' '}
+              <button
+                type="button"
+                onClick={() => navigate('/terms')}
+                className="text-primary hover:underline font-medium"
+              >
+                Conditions Générales d'Utilisation
+              </button>
+            </p>
+          )}
         </form>
 
         {/* Toggle Mode */}

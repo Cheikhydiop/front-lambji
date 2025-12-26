@@ -20,6 +20,7 @@ import MyBets from "./pages/MyBets";
 import AvailableBets from "./pages/AvailableBets"; // NOUVELLE PAGE
 import WalletPage from "./pages/Wallet";
 import Profile from "./pages/Profile";
+import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { RequireAdmin } from "@/components/common/RequireAdmin";
@@ -74,6 +75,7 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/verify-email" element={<EmailVerification />} />
               <Route path="/device-verification" element={<DeviceVerification />} />
+              <Route path="/terms" element={<TermsOfService />} />
 
               {/* Routes avec barre de navigation */}
               <Route element={<Layout />}>
