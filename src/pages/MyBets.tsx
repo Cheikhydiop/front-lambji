@@ -156,7 +156,7 @@ export default function MyBets() {
       pendingBets: pendingBets.length,
       acceptedBets: acceptedBets.length,
       cancelledBets: cancelledBets.length,
-      winRate: historyBets.length > 0 ? (wonBets.length / historyBets.length) * 100 : 0,
+      winRate: bets.length > 0 ? (wonBets.length / bets.length) * 100 : 0,
       totalWinnings,
       totalInvested,
       profit,
@@ -321,75 +321,59 @@ export default function MyBets() {
           </div>
         </div>
 
-        {/* Statistiques détaillées */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
-          <Card className="border shadow-sm">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Profit net</p>
-                  <p className={`text-lg font-bold ${calculatedStats.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {calculatedStats.profit >= 0 ? '+' : ''}{formatAmount(calculatedStats.profit)} FCFA
-                  </p>
-                </div>
-                <div className={`p-2 rounded-lg ${calculatedStats.profit >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
-                  {calculatedStats.profit >= 0 ? (
-                    <TrendingUp className="w-4 h-4 text-green-600" />
-                  ) : (
-                    <TrendingDown className="w-4 h-4 text-red-600" />
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Statistiques Dynamiques (Style Premium) */}
+        <div className="bg-[#1a1b1e] border border-white/5 rounded-2xl p-6 mb-6 shadow-2xl relative overflow-hidden group">
+          {/* Effet de lueur en arrière-plan */}
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 blur-[100px] rounded-full transition-all duration-700 group-hover:bg-primary/20"></div>
 
-          <Card className="border shadow-sm">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Taux de gain</p>
-                  <p className="text-lg font-bold text-foreground">
-                    {calculatedStats.winRate.toFixed(1)}%
-                  </p>
-                </div>
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Trophy className="w-4 h-4 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="relative z-10 grid grid-cols-3 gap-4 items-center">
+            {/* Paris Totaux */}
+            <div className="text-center">
+              <p className="text-3xl font-black text-amber-500 mb-1 tracking-tighter">
+                {calculatedStats.totalBets}
+              </p>
+              <p className="text-[10px] uppercase font-extrabold text-gray-500 tracking-[0.1em]">
+                Paris totaux
+              </p>
+            </div>
 
-          <Card className="border shadow-sm">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Gains totaux</p>
-                  <p className="text-lg font-bold text-green-600">
-                    {formatAmount(calculatedStats.totalWinnings)} FCFA
-                  </p>
-                </div>
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <TrendingUp className="w-4 h-4 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            {/* Victoires */}
+            <div className="text-center border-x border-white/10 px-2">
+              <p className="text-3xl font-black text-emerald-500 mb-1 tracking-tighter">
+                {calculatedStats.wonBets}
+              </p>
+              <p className="text-[10px] uppercase font-extrabold text-gray-500 tracking-[0.1em]">
+                Victoires
+              </p>
+            </div>
 
-          <Card className="border shadow-sm">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Total misé</p>
-                  <p className="text-lg font-bold text-foreground">
-                    {formatAmount(calculatedStats.totalInvested)} FCFA
-                  </p>
-                </div>
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <Ticket className="w-4 h-4 text-orange-600" />
-                </div>
+            {/* Taux de réussite */}
+            <div className="text-center">
+              <p className="text-3xl font-black text-white mb-1 tracking-tighter">
+                {Math.round(calculatedStats.winRate)}%
+              </p>
+              <p className="text-[10px] uppercase font-extrabold text-gray-500 tracking-[0.1em]">
+                Taux réussite
+              </p>
+            </div>
+          </div>
+
+          {/* Barre de profit discrète en bas */}
+          <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className={`p-1.5 rounded-md ${calculatedStats.profit >= 0 ? 'bg-emerald-500/10' : 'bg-red-500/10'}`}>
+                {calculatedStats.profit >= 0 ? (
+                  <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
+                ) : (
+                  <TrendingDown className="w-3.5 h-3.5 text-red-500" />
+                )}
               </div>
-            </CardContent>
-          </Card>
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Bilan financier</span>
+            </div>
+            <p className={`text-sm font-black ${calculatedStats.profit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+              {calculatedStats.profit >= 0 ? '+' : ''}{formatAmount(calculatedStats.profit)} <span className="text-[10px] font-medium opacity-70">FCFA</span>
+            </p>
+          </div>
         </div>
 
         {/* Détails par statut */}

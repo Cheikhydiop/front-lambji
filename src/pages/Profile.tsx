@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Settings, LogOut, ChevronRight, Shield, Bell, HelpCircle, FileText, ArrowLeft, Check, Trash2, Wallet } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -8,6 +9,7 @@ import { useNotifications } from '@/contexts/NotificationContext';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import betService, { BetStats } from '@/services/BetService';
 
 interface ProfileProps {
   tab?: string;
@@ -26,6 +28,28 @@ export default function Profile({ tab }: ProfileProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { notifications, markAsRead, deleteNotification, markAllAsRead } = useNotifications();
+  const [stats, setStats] = useState<BetStats | null>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadStats();
+    }
+  }, [isAuthenticated]);
+
+  const loadStats = async () => {
+    try {
+      setIsLoadingStats(true);
+      const response = await betService.getBetStats();
+      if (response.data) {
+        setStats(response.data);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des statistiques:', error);
+    } finally {
+      setIsLoadingStats(false);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -200,20 +224,42 @@ export default function Profile({ tab }: ProfileProps) {
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="px-4 py-2">
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-gradient-card rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-primary">12</p>
-              <p className="text-xs text-muted-foreground">Paris totaux</p>
-            </div>
-            <div className="bg-gradient-card rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-accent">8</p>
-              <p className="text-xs text-muted-foreground">Victoires</p>
-            </div>
-            <div className="bg-gradient-card rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-foreground">67%</p>
-              <p className="text-xs text-muted-foreground">Taux réussite</p>
+        {/* Stats Section - Premium Design */}
+        <div className="px-4 py-4">
+          <div className="bg-[#1a1b1e] border border-white/5 rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
+            {/* Background Glow Effect */}
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 blur-[120px] rounded-full transition-all duration-700 group-hover:bg-primary/20"></div>
+
+            <div className="relative z-10 grid grid-cols-3 gap-4 items-center">
+              {/* Paris Totaux */}
+              <div className="text-center">
+                <p className="text-3xl font-black text-amber-500 mb-1 tracking-tighter">
+                  {isLoadingStats ? '...' : (stats?.totalBets || 0)}
+                </p>
+                <p className="text-[10px] uppercase font-extrabold text-gray-500 tracking-[0.1em]">
+                  Paris totaux
+                </p>
+              </div>
+
+              {/* Victoires */}
+              <div className="text-center border-x border-white/10 px-2">
+                <p className="text-3xl font-black text-emerald-500 mb-1 tracking-tighter">
+                  {isLoadingStats ? '...' : (stats?.totalWon || 0)}
+                </p>
+                <p className="text-[10px] uppercase font-extrabold text-gray-500 tracking-[0.1em]">
+                  Victoires
+                </p>
+              </div>
+
+              {/* Taux de réussite */}
+              <div className="text-center">
+                <p className="text-3xl font-black text-white mb-1 tracking-tighter">
+                  {isLoadingStats ? '...' : `${Math.round(stats?.winRate || 0)}%`}
+                </p>
+                <p className="text-[10px] uppercase font-extrabold text-gray-500 tracking-[0.1em]">
+                  Taux réussite
+                </p>
+              </div>
             </div>
           </div>
         </div>
