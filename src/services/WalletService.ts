@@ -55,18 +55,21 @@ class WalletService extends BaseService {
     }
 
     async deposit(data: DepositRequest): Promise<ApiResponse<any>> {
-        return this.post<any>('/deposit', {
-            amount: data.amount.toString(),
-            provider: data.provider,
-            phoneNumber: data.phoneNumber
+        const result = await this.post<any>('/deposit', {
+            amount: Number(data.amount)  // Convertir en number
         });
+
+        // Si le backend retourne une checkoutUrl (mode Wave Mock), rediriger
+        if (result.success && result.data?.checkoutUrl) {
+            window.location.href = result.data.checkoutUrl;
+        }
+
+        return result;
     }
 
     async withdraw(data: WithdrawalRequestData): Promise<ApiResponse<any>> {
-        return this.post<any>('/withdraw', {
-            amount: data.amount.toString(),
-            provider: data.provider,
-            phoneNumber: data.phoneNumber
+        return this.post<any>('/withdrawal', {  // Changé de /withdraw à /withdrawal
+            amount: Number(data.amount)  // Convertir en number
         });
     }
 

@@ -21,6 +21,8 @@ import AvailableBets from "./pages/AvailableBets"; // NOUVELLE PAGE
 import WalletPage from "./pages/Wallet";
 import Profile from "./pages/Profile";
 import TermsOfService from "./pages/TermsOfService";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentError from "./pages/PaymentError";
 import NotFound from "./pages/NotFound";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { RequireAdmin } from "@/components/common/RequireAdmin";
@@ -76,6 +78,10 @@ const App = () => (
               <Route path="/verify-email" element={<EmailVerification />} />
               <Route path="/device-verification" element={<DeviceVerification />} />
               <Route path="/terms" element={<TermsOfService />} />
+
+              {/* Callbacks paiement Wave */}
+              <Route path="/payment/success" element={<PaymentSuccess />} />
+              <Route path="/payment/error" element={<PaymentError />} />
 
               {/* Routes avec barre de navigation */}
               <Route element={<Layout />}>
