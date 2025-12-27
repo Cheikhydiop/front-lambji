@@ -20,13 +20,10 @@ export class TransactionService extends BaseService {
         super('/transactions');
     }
 
-    // Obtenir le solde et l'historique
-    getWallet(): Promise<ApiResponse<WalletData>> {
-        return this.get<WalletData>('/wallet');
-    }
-
+    // Obtenir l'historique des transactions
+    // Backend route: GET /api/transactions?limit=X&offset=Y
     getHistory(limit = 10, offset = 0): Promise<ApiResponse<Transaction[]>> {
-        return this.get<Transaction[]>(`/history?limit=${limit}&offset=${offset}`);
+        return this.get<Transaction[]>(`/?limit=${limit}&offset=${offset}`);
     }
 
     // Dépôt
