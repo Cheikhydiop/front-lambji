@@ -1,96 +1,57 @@
-import { useEffect, useState } from 'react';
 import { Users, Swords, Trophy, Wallet, TrendingUp, TrendingDown, Clock, AlertCircle, Shield } from 'lucide-react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { ADMIN_PATH } from '@/config/admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { adminService, DashboardStats, AnalyticsData } from '@/services/AdminService';
 import { fightService, Fight } from '@/services/FightService';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { webSocketService, WebSocketMessageType } from '@/services/WebSocketService';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-
-const mockStats: DashboardStats = {
-  totalUsers: 1234,
-  activeUsers: 856,
-  totalFights: 45,
-  upcomingFights: 8,
-  totalBets: 3456,
-  pendingBets: 127,
-  acceptedBets: 3120,
-  cancelledBets: 209,
-  totalVolume: 45678000,
-  pendingWithdrawals: 12,
-  todayDeposits: 2500000,
-  todayWithdrawals: 1800000,
-  totalCommission: 150000,
-  todayCommission: 12000,
-};
+import { useAdminDashboardStats, useAdminAnalytics, useRefreshAdminData } from '@/hooks/useAdminData';
+import { useAdminRealtimeSync } from '@/hooks/useAdminWebSocketSync';
+import { useQuery } from '@tanstack/react-query';
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-  const [ongoingFights, setOngoingFights] = useState<Fight[]>([]);
-  const [loading, setLoading] = useState(true);
+  // ✅ React Query hooks avec auto-refetch
+  const { data: stats, isLoading: statsLoading } = useAdminDashboardStats();
+  const { data: analytics, isLoading: analyticsLoading } = useAdminAnalytics();
 
-  useEffect(() => {
-    loadData();
+  // Combats en cours
+  const { data: ongoingFights = [], isLoading: fightsLoading } = useQuery({
+    queryKey: ['admin', 'fights', 'ongoing'],
+    queryFn: async () => {
+      const res = await fightService.getFights({ status: 'ONGOING' });
+      return res.data || [];
+    },
+    refetchInterval: 15000, // Refetch toutes les 15s
+  });
 
-    // Polling de sécurité toutes les 30 secondes
-    const interval = setInterval(loadData, 30000);
+  // ✅ Sync temps réel WebSocket
+  useAdminRealtimeSync();
 
-    // WebSocket Listeners pour le temps réel
-    const handleUpdate = () => loadData();
+  // Bouton rafraîchir manuel
+  const refreshAll = useRefreshAdminData();
 
-    // S'abonner à tous les événements pertinents pour le dashboard
-    webSocketService.on(WebSocketMessageType.FIGHT_STATUS_UPDATE, handleUpdate);
-    webSocketService.on(WebSocketMessageType.FIGHT_RESULT, handleUpdate);
-    webSocketService.on(WebSocketMessageType.FIGHT_STARTED, handleUpdate);
-    webSocketService.on(WebSocketMessageType.FIGHT_FINISHED, handleUpdate);
-    webSocketService.on(WebSocketMessageType.FIGHT_CANCELLED, handleUpdate);
-    webSocketService.on(WebSocketMessageType.BET_ACCEPTED, handleUpdate);
-    webSocketService.on(WebSocketMessageType.BET_CANCELLED, handleUpdate);
-    webSocketService.on(WebSocketMessageType.TRANSACTION_CONFIRMED, handleUpdate);
-
-    return () => {
-      clearInterval(interval);
-      webSocketService.off(WebSocketMessageType.FIGHT_STATUS_UPDATE, handleUpdate);
-      webSocketService.off(WebSocketMessageType.FIGHT_RESULT, handleUpdate);
-      webSocketService.off(WebSocketMessageType.FIGHT_STARTED, handleUpdate);
-      webSocketService.off(WebSocketMessageType.FIGHT_FINISHED, handleUpdate);
-      webSocketService.off(WebSocketMessageType.FIGHT_CANCELLED, handleUpdate);
-      webSocketService.off(WebSocketMessageType.BET_ACCEPTED, handleUpdate);
-      webSocketService.off(WebSocketMessageType.BET_CANCELLED, handleUpdate);
-      webSocketService.off(WebSocketMessageType.TRANSACTION_CONFIRMED, handleUpdate);
-    };
-  }, []);
-
-  const loadData = async () => {
-    try {
-      const [statsRes, fightsRes, analyticsRes] = await Promise.all([
-        adminService.getDashboardStats(),
-        fightService.getFights({ status: 'ONGOING' }),
-        adminService.getAnalytics()
-      ]);
-
-      if (statsRes.data) setStats(statsRes.data);
-      else setStats(mockStats);
-
-      if (fightsRes.data) setOngoingFights(fightsRes.data);
-      if (analyticsRes.data) setAnalytics(analyticsRes.data);
-    } catch {
-      setStats(mockStats);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loading = statsLoading || analyticsLoading || fightsLoading;
 
   if (loading) {
     return (
       <AdminLayout title="Dashboard">
         <div className="flex items-center justify-center h-64">
           <LoadingSpinner size="lg" />
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  // ❌ PLUS DE DONNÉES MOCK - Afficher message si pas de données
+  if (!stats) {
+    return (
+      <AdminLayout title="Dashboard">
+        <div className="flex flex-col items-center justify-center h-64 space-y-4">
+          <AlertCircle className="w-12 h-12 text-muted-foreground" />
+          <p className="text-muted-foreground">Impossible de charger les statistiques</p>
+          <Button onClick={refreshAll}>Réessayer</Button>
         </div>
       </AdminLayout>
     );
@@ -144,7 +105,7 @@ export default function AdminDashboard() {
     <AdminLayout title="Dashboard">
       <div className="space-y-6">
         <div className="flex justify-end mb-4">
-          <Button variant="outline" size="sm" onClick={() => loadData()} disabled={loading}>
+          <Button variant="outline" size="sm" onClick={refreshAll} disabled={loading}>
             <Clock className="w-4 h-4 mr-2" />
             Rafraîchir
           </Button>

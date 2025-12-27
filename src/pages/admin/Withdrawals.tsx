@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Search, Check, X, Clock } from 'lucide-react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Input } from '@/components/ui/input';
@@ -20,80 +20,44 @@ import {
 } from '@/components/ui/table';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { adminService } from '@/services/AdminService';
 import { WithdrawalRequest } from '@/services/WalletService';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-
-const mockWithdrawals: WithdrawalRequest[] = [
-  {
-    id: '1',
-    amount: 50000,
-    phoneNumber: '77 123 45 67',
-    provider: 'WAVE',
-    status: 'PENDING',
-    requestedAt: new Date(Date.now() - 3600000).toISOString(),
-    user: { id: '1', name: 'Moussa Diop', email: 'moussa@example.com' },
-  },
-  {
-    id: '2',
-    amount: 25000,
-    phoneNumber: '78 987 65 43',
-    provider: 'ORANGE_MONEY',
-    status: 'PENDING',
-    requestedAt: new Date(Date.now() - 7200000).toISOString(),
-    user: { id: '2', name: 'Fatou Sow', email: 'fatou@example.com' },
-  },
-];
+import { useAdminPendingWithdrawals, useApproveWithdrawal, useRejectWithdrawal } from '@/hooks/useAdminData';
+import { useAdminRealtimeSync } from '@/hooks/useAdminWebSocketSync';
 
 export default function AdminWithdrawals() {
-  const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>([]);
-  const [loading, setLoading] = useState(true);
+  // ✅ React Query hooks - Plus de données mock !
+  const { data: withdrawals = [], isLoading } = useAdminPendingWithdrawals();
+  const approveMutation = useApproveWithdrawal();
+  const rejectMutation = useRejectWithdrawal();
+
+  // ✅ Sync temps réel
+  useAdminRealtimeSync();
+
   const [search, setSearch] = useState('');
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [selectedWithdrawal, setSelectedWithdrawal] = useState<WithdrawalRequest | null>(null);
   const [rejectReason, setRejectReason] = useState('');
-  const { toast } = useToast();
 
-  useEffect(() => {
-    loadWithdrawals();
-  }, []);
-
-  const loadWithdrawals = async () => {
-    try {
-      const response = await adminService.getPendingWithdrawals();
-      setWithdrawals(response.data || mockWithdrawals);
-    } catch {
-      setWithdrawals(mockWithdrawals);
-    } finally {
-      setLoading(false);
-    }
+  const handleApprove = (withdrawalId: string) => {
+    approveMutation.mutate(withdrawalId);
   };
 
-  const handleApprove = async (withdrawalId: string) => {
-    try {
-      await adminService.approveWithdrawal(withdrawalId);
-      toast({ title: 'Retrait approuvé' });
-      loadWithdrawals();
-    } catch {
-      toast({ title: 'Erreur', variant: 'destructive' });
-    }
-  };
-
-  const handleReject = async () => {
+  const handleReject = () => {
     if (!selectedWithdrawal || !rejectReason) return;
-    try {
-      await adminService.rejectWithdrawal(selectedWithdrawal.id, rejectReason);
-      toast({ title: 'Retrait rejeté' });
-      setRejectDialogOpen(false);
-      setSelectedWithdrawal(null);
-      setRejectReason('');
-      loadWithdrawals();
-    } catch {
-      toast({ title: 'Erreur', variant: 'destructive' });
-    }
+
+    rejectMutation.mutate(
+      { withdrawalId: selectedWithdrawal.id, reason: rejectReason },
+      {
+        onSuccess: () => {
+          setRejectDialogOpen(false);
+          setSelectedWithdrawal(null);
+          setRejectReason('');
+        },
+      }
+    );
   };
 
   const openRejectDialog = (withdrawal: WithdrawalRequest) => {
@@ -137,7 +101,7 @@ export default function AdminWithdrawals() {
       w.phoneNumber.includes(search)
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
       <AdminLayout title="Retraits">
         <div className="flex items-center justify-center h-64">
